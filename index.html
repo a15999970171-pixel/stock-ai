@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Quant Scanner - LLM Engine with Gems</title>
+    <title>Universal Quant Scanner - Vision Engine</title>
     <style>
         :root { --primary: #00f0ff; --secondary: #7000ff; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --border: rgba(0, 240, 255, 0.3); --danger: #ef4444; --text: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'PingFang SC', sans-serif; }
@@ -49,14 +49,25 @@
         .btn-delete:hover { background: var(--danger); color: #fff; }
         .btn-add { width: 100%; padding: 10px; background: rgba(0, 240, 255, 0.05); border: 1px dashed var(--primary); border-radius: 6px; color: var(--primary); font-size: 14px; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
         .btn-add:hover { background: rgba(0, 240, 255, 0.15); }
-        .box-container { background: rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; }
+        .box-container { background: rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .box-header { background: rgba(255, 255, 255, 0.05); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
         .box-title { font-size: 13px; color: var(--primary); font-weight: bold; } .query-title { color: #f59e0b; }
         .controls { display: flex; gap: 8px; } .control-btn { width: 26px; height: 26px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s; }
         .control-btn:hover { background: rgba(255,255,255,0.2); }
+        
+        /* 输入区与媒体预览区 */
         textarea { width: 100%; height: 100px; background: transparent; border: none; color: #fff; padding: 15px; font-size: 15px; line-height: 1.6; resize: none; outline: none; }
+        
+        .media-preview-container { display: none; padding: 0 15px 15px 15px; gap: 10px; }
+        .media-preview-container.show { display: flex; }
+        .preview-box { position: relative; width: 80px; height: 80px; border-radius: 8px; border: 1px solid var(--primary); overflow: hidden; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-remove { position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .preview-remove:hover { background: #dc2626; }
+
         #output-area { height: 450px; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.7; background: rgba(0, 0, 0, 0.7); }
         .msg-user { color: #f59e0b; font-weight: bold; margin-top: 15px; margin-bottom: 10px; border-left: 3px solid #f59e0b; padding-left: 10px; }
+        .msg-user img { max-width: 200px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); display: block; margin-top: 10px; }
         .msg-ai { color: #ffffff; text-shadow: 0 0 8px rgba(0, 240, 255, 0.4); background: rgba(15, 23, 42, 0.7); padding: 16px; border-radius: 8px; border-left: 3px solid var(--primary); margin-bottom: 20px; white-space: pre-wrap; }
         .msg-error { color: #ef4444; font-weight: bold; margin-bottom: 20px; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; }
         .btn-run { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 2px; transition: 0.3s; }
@@ -99,11 +110,9 @@
                 <span>✦ My Gems (策略预设)</span>
                 <button class="btn-add-gem" onclick="openGemsModal()" title="新建固定提示词">⊕</button>
             </div>
-            <div class="gems-list" id="gems-list">
-                </div>
+            <div class="gems-list" id="gems-list"></div>
             
             <div class="divider" style="margin: 5px 0 15px 0;"></div>
-            
             <div class="session-list" id="session-list"></div>
         </div>
         
@@ -116,8 +125,8 @@
                 </div>
                 <div class="input-row">
                     <div class="config-group" style="flex: 1;">
-                        <label>✦ 模型名称 (Model ID)</label>
-                        <input type="text" id="api-main-model" placeholder="如: glm-4" oninput="saveConfigToLocal()">
+                        <label>✦ 模型名称 (必须支持 Vision，如 glm-4v)</label>
+                        <input type="text" id="api-main-model" placeholder="如: glm-4v 或 gpt-4o" oninput="saveConfigToLocal()">
                     </div>
                     <div class="config-group" style="flex: 2;">
                         <label>✦ API 密钥 (Bearer Token)</label>
@@ -138,13 +147,21 @@
             </div>
             <div class="box-container" id="queryContainer">
                 <div class="box-header">
-                    <span class="box-title query-title">INPUT_QUERY (输入筛选指令)</span>
+                    <span class="box-title query-title">INPUT_QUERY (输入指令与附件)</span>
                     <div class="controls">
+                        <input type="file" id="mediaUpload" accept="image/*, video/*" style="display: none;" onchange="handleMediaSelect(event)">
+                        <button class="control-btn" onclick="document.getElementById('mediaUpload').click()" title="上传图片/视频 (自动抽帧解析)">📎</button>
                         <button class="control-btn" onclick="toggleFullscreen('queryContainer')" title="全屏">⛶</button>
                         <button class="control-btn" onclick="clearBox('queryArea')" title="清空">✕</button>
                     </div>
                 </div>
-                <textarea id="queryArea" placeholder="输入量化筛选条件或点击左侧 Gem 快速填入..."></textarea>
+                <textarea id="queryArea" placeholder="输入条件或点击上方 📎 附件按钮上传图片/视频进行多模态分析..."></textarea>
+                <div class="media-preview-container" id="mediaPreviewContainer">
+                    <div class="preview-box" id="previewBox">
+                        <img id="previewImg" src="">
+                        <button class="preview-remove" onclick="removeMedia()">✕</button>
+                    </div>
+                </div>
             </div>
             <button class="btn-run" onclick="executeCommand()">执行扫描策略 / RUN SCANNER</button>
             <div class="box-container" id="resContainer">
@@ -180,7 +197,7 @@
                 <label>Gem 名称</label>
                 <input type="text" id="gemNameInput" placeholder="如：极客硬核滤网 V1">
                 <label>固定筛选条件 / 提示词</label>
-                <textarea id="gemPromptInput" placeholder="在此输入复杂的长串固定筛选指令，例如：&#10;获取所有美股涨幅榜数据...排除市值<20亿..."></textarea>
+                <textarea id="gemPromptInput" placeholder="在此输入复杂的长串固定筛选指令..."></textarea>
                 <button class="btn-save-gem" onclick="saveGem()">保存 Gem</button>
             </div>
         </div>
@@ -196,6 +213,7 @@
         let myGems = JSON.parse(localStorage.getItem('geek_custom_gems')) || [];
         let currentSessionId = null;
         let chatHistory = []; 
+        let currentMediaBase64 = null; // 用于存储视觉图片的全局变量
 
         window.onload = () => {
             document.getElementById('api-main-url').value = localStorage.getItem('geek_api_url') || '';
@@ -214,31 +232,97 @@
             localStorage.setItem('geek_api_key', document.getElementById('api-main-key').value.trim());
         }
 
+        /* ================= 多媒体上传与抽帧解析逻辑 ================= */
+        const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
+        const previewImg = document.getElementById('previewImg');
+        const mediaUploadInput = document.getElementById('mediaUpload');
+
+        async function handleMediaSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            appendSysLog(`侦测到本地文件载入: ${file.name}`);
+
+            if (file.type.startsWith('image/')) {
+                // 处理图片
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentMediaBase64 = e.target.result;
+                    previewImg.src = currentMediaBase64;
+                    mediaPreviewContainer.classList.add('show');
+                    appendSysLog(`图片解析完成，Base64 已装载至显存。`);
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type.startsWith('video/')) {
+                // 极客黑科技：视频前端静默抽帧
+                appendSysLog(`侦测到视频文件。前端防爆破机制启动，正在静默提取关键帧...`, 'warn');
+                try {
+                    const frameBase64 = await extractVideoFrame(file);
+                    currentMediaBase64 = frameBase64;
+                    previewImg.src = currentMediaBase64;
+                    mediaPreviewContainer.classList.add('show');
+                    appendSysLog(`关键帧提取完毕，伪装图片已就绪！`);
+                } catch (e) {
+                    appendSysLog(`视频抽帧失败: ${e.message}`, 'error');
+                    alert("视频解析失败，请直接上传截图。");
+                }
+            } else {
+                alert("目前仅支持图片或视频文件！");
+            }
+            mediaUploadInput.value = ''; // Reset
+        }
+
+        function extractVideoFrame(file) {
+            return new Promise((resolve, reject) => {
+                const video = document.createElement('video');
+                video.autoplay = true;
+                video.muted = true;
+                video.playsInline = true;
+                const fileURL = URL.createObjectURL(file);
+                video.src = fileURL;
+                
+                video.onloadeddata = () => {
+                    // 跳转到第 1 秒处截图（避免黑屏开头）
+                    video.currentTime = Math.min(1, video.duration / 2);
+                };
+                
+                video.onseeked = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    URL.revokeObjectURL(fileURL);
+                };
+                video.onerror = () => reject(new Error("视频格式不受浏览器支持"));
+            });
+        }
+
+        function removeMedia() {
+            currentMediaBase64 = null;
+            mediaPreviewContainer.classList.remove('show');
+            previewImg.src = '';
+            appendSysLog(`视觉附件已移除。`);
+        }
+        /* ========================================================= */
+
         /* ================= Gems 逻辑区 ================= */
         const gemsModal = document.getElementById('gemsModal');
         const gemNameInput = document.getElementById('gemNameInput');
         const gemPromptInput = document.getElementById('gemPromptInput');
         const gemsListEl = document.getElementById('gems-list');
 
-        function openGemsModal() {
-            gemsModal.classList.add('show');
-        }
-
-        function closeGemsModal() {
-            gemsModal.classList.remove('show');
-            gemNameInput.value = '';
-            gemPromptInput.value = '';
-        }
+        function openGemsModal() { gemsModal.classList.add('show'); }
+        function closeGemsModal() { gemsModal.classList.remove('show'); gemNameInput.value = ''; gemPromptInput.value = ''; }
 
         function saveGem() {
             const name = gemNameInput.value.trim();
             const prompt = gemPromptInput.value.trim();
             if (!name || !prompt) { alert("Gem 名称和提示词内容不能为空！"); return; }
-            
             myGems.push({ name, prompt });
             localStorage.setItem('geek_custom_gems', JSON.stringify(myGems));
-            renderGems();
-            closeGemsModal();
+            renderGems(); closeGemsModal();
         }
 
         function renderGems() {
@@ -246,10 +330,9 @@
             myGems.forEach((gem, index) => {
                 const item = document.createElement('div');
                 item.className = 'gem-item';
-                // 点击名称将预设词填入输入框
                 item.innerHTML = `
-                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="点击载入此 Gem" onclick="applyGem(${index})">✨ ${gem.name}</div>
-                    <button class="btn-del-session" onclick="deleteGem(event, ${index})" title="删除此 Gem">✕</button>
+                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="点击载入" onclick="applyGem(${index})">✨ ${gem.name}</div>
+                    <button class="btn-del-session" onclick="deleteGem(event, ${index})" title="删除">✕</button>
                 `;
                 gemsListEl.appendChild(item);
             });
@@ -263,7 +346,7 @@
 
         function deleteGem(event, index) {
             event.stopPropagation();
-            if (confirm("确定要删除这个 Gem 预设吗？")) {
+            if (confirm("确定要删除这个 Gem 吗？")) {
                 myGems.splice(index, 1);
                 localStorage.setItem('geek_custom_gems', JSON.stringify(myGems));
                 renderGems();
@@ -297,18 +380,26 @@
         function createNewSession() {
             currentSessionId = 'session_' + Date.now(); chatHistory = [];
             sessions[currentSessionId] = { title: "新对话", history: [] };
-            saveToLocal(); renderSidebar(); outputArea.innerHTML = ''; document.getElementById('queryArea').value = '';
+            saveToLocal(); renderSidebar(); outputArea.innerHTML = ''; 
+            document.getElementById('queryArea').value = ''; removeMedia();
         }
 
         function loadSession(id) {
             currentSessionId = id; chatHistory = sessions[id].history || []; renderSidebar(); outputArea.innerHTML = '';
             chatHistory.forEach(msg => {
                 if (msg.role === 'user') {
-                    let cleanContent = msg.content;
-                    if(cleanContent.includes('【Quant Scanner 指令】')) {
-                        cleanContent = cleanContent.split('用户动态条件：\n')[1].split('\n\n【辅助节点获取的数据】')[0];
+                    // 兼容普通文本和多模态协议显示
+                    let displayContent = msg.content;
+                    let displayImg = '';
+                    if (Array.isArray(msg.content)) {
+                        displayContent = msg.content.find(item => item.type === 'text')?.text || "【多模态请求】";
+                        const imgUrl = msg.content.find(item => item.type === 'image_url')?.image_url?.url;
+                        if(imgUrl) displayImg = `<img src="${imgUrl}">`;
                     }
-                    outputArea.innerHTML += `<div class="msg-user">用户提问: ${cleanContent}</div>`;
+                    if(displayContent.includes('【Quant Scanner 指令】')) {
+                        displayContent = displayContent.split('用户动态条件：\n')[1].split('\n\n【辅助节点获取的数据】')[0];
+                    }
+                    outputArea.innerHTML += `<div class="msg-user">用户提问: ${displayContent} ${displayImg}</div>`;
                 } else if (msg.role === 'assistant') {
                     outputArea.innerHTML += `<div class="msg-ai">${msg.content}</div>`;
                 }
@@ -340,14 +431,14 @@
         function removeNode(btnElement) { btnElement.closest('.dynamic-node').remove(); updateNodeLabels(); }
         function updateNodeLabels() { document.querySelectorAll('.dynamic-node .dynamic-label').forEach((label, index) => { label.innerText = `✦ 参考节点 ${index + 3}`; }); }
 
-        function clearBox(areaId) { document.getElementById(areaId).value = ""; }
+        function clearBox(areaId) { document.getElementById(areaId).value = ""; removeMedia(); }
         function toggleFullscreen(containerId) {
             const container = document.getElementById(containerId); container.classList.toggle('fullscreen');
             document.body.style.overflow = container.classList.contains('fullscreen') ? 'hidden' : 'auto';
         }
 
         // ==========================================================
-        // 核心执行逻辑
+        // 核心进化：视觉多模态兼容引擎
         // ==========================================================
         async function executeCommand() {
             const queryInput = document.getElementById('queryArea');
@@ -356,48 +447,47 @@
             const apiModel = document.getElementById('api-main-model').value.trim();
             const apiKey = document.getElementById('api-main-key').value.trim();
 
-            if (!query) { alert("请输入筛选指令！"); return; }
-            if (!apiUrl || !apiModel || !apiKey) { alert("主模型的配置缺一不可！"); return; }
+            if (!query && !currentMediaBase64) { alert("请输入指令或上传图片！"); return; }
+            if (!apiUrl || !apiModel || !apiKey) { alert("主模型的配置缺一不可！\n(如果使用图片，请确保模型支持 Vision，如 glm-4v)"); return; }
 
             saveConfigToLocal();
             if (chatHistory.length === 0 || sessions[currentSessionId].title === "新对话") {
-                sessions[currentSessionId].title = query.substring(0, 15) + (query.length > 15 ? '...' : '');
+                sessions[currentSessionId].title = query ? query.substring(0, 15) + '...' : '多模态视觉分析';
             }
 
-            outputArea.innerHTML += `<div class="msg-user">用户提问: ${query}</div>`;
+            // 在界面上渲染发送出去的图文
+            let userDisplayHtml = query;
+            if (currentMediaBase64) { userDisplayHtml += `<img src="${currentMediaBase64}">`; }
+            outputArea.innerHTML += `<div class="msg-user">用户提问: ${userDisplayHtml}</div>`;
             outputArea.scrollTop = outputArea.scrollHeight;
+            
+            // 发送后清空输入框和预览图
             queryInput.value = ""; 
+            const mediaPayload = currentMediaBase64; // 暂存发送，用于构建 JSON
+            removeMedia(); 
 
-            // 生成请求时间戳，禁用缓存
             const runTimestamp = new Date().toISOString();
             const cacheBuster = `_t=${Date.now()}`;
             
-            appendSysLog(`=== 真实抓取流程开启 (所有网页端沙盒限制已移除) ===`);
-            appendSysLog(`执行时间戳: ${runTimestamp}`);
+            appendSysLog(`=== 真实抓取流程与多模态引擎启动 ===`);
 
             try {
                 let combinedRawData = "";
                 const allNodes = document.querySelectorAll('.ref-api-input'); 
                 let dataSourceMeta = "未配置有效节点网址";
                 
-                // 1. 暴力抓取所有节点数据 (API Scan)
                 for (let i = 0; i < allNodes.length; i++) {
                     const nodeValue = allNodes[i].value.trim();
                     if (nodeValue) {
                         if (nodeValue.startsWith('http://') || nodeValue.startsWith('https://')) {
-                            // 记录第一个有效的数据源来源
-                            if (dataSourceMeta === "未配置有效节点网址") {
-                                dataSourceMeta = nodeValue.split('?')[0]; 
-                            }
-                            
+                            if (dataSourceMeta === "未配置有效节点网址") dataSourceMeta = nodeValue.split('?')[0]; 
                             const fetchUrl = nodeValue.includes('?') ? `${nodeValue}&${cacheBuster}` : `${nodeValue}?${cacheBuster}`;
-                            appendSysLog(`正在尝试真实抓取节点 ${i + 1} 数据... (Cache Disabled)`);
+                            appendSysLog(`正在尝试真实抓取节点 ${i + 1} 数据...`);
                             
                             try {
                                 const res = await fetch(fetchUrl, { cache: 'no-store' });
                                 if (res.ok) {
                                     const textData = await res.text();
-                                    // 为防止撑爆大模型 token 上限，保留截断逻辑但放宽上限至 30000 字符
                                     const truncatedData = textData.length > 30000 ? textData.substring(0, 30000) + '\n...[因数据量过大，为保证模型稳定已截断]' : textData;
                                     combinedRawData += `【节点 ${i + 1} 来源网址: ${dataSourceMeta}】:\n${truncatedData}\n\n`;
                                     appendSysLog(`节点 ${i + 1} 抓取成功。`);
@@ -409,35 +499,43 @@
                                 appendSysLog(`节点 ${i + 1} 网络异常: ${e.message}`, 'error');
                             }
                         } else {
-                            // 如果填入的是纯文本，作为补充信息
                             combinedRawData += `【节点 ${i + 1} 文本补充信息】: ${nodeValue}\n\n`;
                         }
                     }
                 }
 
-                // 2. 将 Raw Data 丢给大模型，让大模型自行推理 (AI Summarize)
-                appendSysLog(`所有节点数据抓取完毕。正在将原生数据交由 AI 大模型进行独立计算与推理...`);
-
-                const finalPrompt = `【Quant Scanner 指令】：
-您是专业的量化分析引擎。前端系统已经为你抓取了底层 API 提供的一手原生数据流。现在需要你接管运算大脑。
+                const textPrompt = `【Quant Scanner 指令】：
+您是专业的量化分析与视觉推理引擎。前端系统已经为你抓取了底层 API 提供的一手原生数据流。
 
 用户动态条件：
-${query}
+${query || "请分析我提供的图片/数据。"}
 
 【辅助节点获取的数据】（Raw Data）：
-${combinedRawData || "未抓取到有效数据"}
+${combinedRawData || "未抓取到有效外部数据"}
 
 【输出要求（强制）】：
-1. 你的回答必须在最开头，强制按照此格式打印元数据（不要加粗，直接输出）：
+1. 你的回答必须在最开头，按照此格式打印元数据：
    数据时间: ${runTimestamp} UTC
    行情来源: ${dataSourceMeta}
-   扫描股票数量: [请根据你处理的实际股票数量填写，或者填写 '全市场扫描']
+   扫描股票数量: [请据实填写，或填写 '全市场扫描'，若分析图片请填写 '视觉模态分析']
 
-2. 仔细阅读辅助数据。结合你自身庞大的内置金融知识库、实时搜索能力和逻辑推演能力，独立完成用户要求的量化筛选（如过滤市值、排除ADR/Meme/Mag7、计算涨跌幅等）。
-3. 绝对不要列出或解释被排除的股票及其原因。直接给出最终符合条件的股票清单及催化剂分析。
-4. 如果抓取的数据不足或残缺，你必须突破数据的局限，利用你的模型内置知识强制推演并补全结果，绝对不允许回答“无法完成任务”。`;
+2. 仔细阅读辅助数据（或视觉附件）。结合你的实时推演能力，完成用户的请求。
+3. 绝对不要列出或解释被排除的股票及其原因。直接给出结论。
+4. 绝对不允许回答“无法完成任务”。`;
 
-                chatHistory.push({ role: "user", content: finalPrompt });
+                // 构建支持 OpenAI Vision 格式的 Payload
+                let finalContent;
+                if (mediaPayload) {
+                    finalContent = [
+                        { type: "text", text: textPrompt },
+                        { type: "image_url", image_url: { url: mediaPayload } }
+                    ];
+                    appendSysLog("检测到视觉附件，已自动切换为 OpenAI Vision 多模态协议发送。");
+                } else {
+                    finalContent = textPrompt;
+                }
+
+                chatHistory.push({ role: "user", content: finalContent });
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
@@ -469,7 +567,7 @@ ${combinedRawData || "未抓取到有效数据"}
 
             } catch (error) {
                 appendSysLog(`Pipeline crashed: ${error.message}`, 'error');
-                outputArea.innerHTML += `<div class="msg-error">[系统中止] ${error.message}</div>`;
+                outputArea.innerHTML += `<div class="msg-error">[系统中止] ${error.message} <br>⚠️ 提示：如果您上传了图片，请确保当前模型名称填入的是支持多模态视觉的模型（例如 glm-4v, gpt-4o 等），纯文本模型会报错！</div>`;
                 outputArea.scrollTop = outputArea.scrollHeight;
                 chatHistory.pop(); 
             }
