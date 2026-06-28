@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Quant Scanner - LLM Engine</title>
+    <title>Universal Quant Scanner - LLM Engine with Gems</title>
     <style>
         :root { --primary: #00f0ff; --secondary: #7000ff; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --border: rgba(0, 240, 255, 0.3); --danger: #ef4444; --text: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'PingFang SC', sans-serif; }
@@ -12,9 +12,20 @@
         .cyber-bg::before { content: ""; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg); animation: grid-move 10s linear infinite; }
         @keyframes grid-move { from { background-position: 0 0; } to { background-position: 0 40px; } }
         .app-container { display: flex; width: 100%; max-width: 1400px; gap: 20px; align-items: flex-start; }
+        
+        /* 左侧边栏 */
         .sidebar { width: 280px; flex-shrink: 0; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); position: sticky; top: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); }
-        .btn-new-chat { width: 100%; padding: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-new-chat { width: 100%; padding: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
         .btn-new-chat:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
+        
+        /* Gems 专属区样式 */
+        .gems-header { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 13px; font-weight: bold; margin-bottom: 10px; padding: 0 5px; flex-shrink: 0; }
+        .btn-add-gem { background: transparent; border: none; color: var(--secondary); font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-add-gem:hover { color: #fff; text-shadow: 0 0 8px var(--secondary); }
+        .gems-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; flex-shrink: 0; max-height: 200px; overflow-y: auto; padding-right: 5px; }
+        .gem-item { background: rgba(112, 0, 255, 0.1); border: 1px dashed rgba(112, 0, 255, 0.4); border-radius: 6px; padding: 10px; cursor: pointer; font-size: 13px; color: #cbd5e1; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
+        .gem-item:hover { background: rgba(112, 0, 255, 0.25); border-color: var(--secondary); color: #fff; }
+        
         .session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; } ::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.3); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
         .session-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
@@ -24,6 +35,8 @@
         .session-item.active .session-title { color: #fff; font-weight: bold; }
         .btn-del-session { background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-del-session:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        
+        /* 右侧主区域 */
         .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; gap: 20px; }
         .container, .box-container { width: 100%; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); }
         .container { padding: 30px; }
@@ -48,6 +61,8 @@
         .msg-error { color: #ef4444; font-weight: bold; margin-bottom: 20px; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; }
         .btn-run { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 2px; transition: 0.3s; }
         .btn-run:hover { filter: brightness(1.2); box-shadow: 0 0 20px var(--primary); }
+        
+        /* 日志面板 UI */
         .btn-log-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 1000; padding: 12px 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
         .btn-log-toggle:hover { background: var(--primary); color: #000; box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
         .log-panel { position: fixed; bottom: 70px; right: 20px; width: 450px; height: 350px; background: rgba(5, 9, 20, 0.95); border: 1px solid var(--border); border-radius: 12px; z-index: 999; display: flex; flex-direction: column; transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.8); visibility: hidden; }
@@ -57,6 +72,21 @@
         .log-entry { margin-bottom: 6px; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 4px; } .log-entry.error { color: var(--danger); } .log-entry.warn { color: #f59e0b; }
         .box-container.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: 100vw; z-index: 9999; border-radius: 0; margin: 0; } .box-container.fullscreen #output-area { height: calc(100vh - 45px); font-size: 18px; }
         @media (max-width: 900px) { .app-container { flex-direction: column; } .sidebar { width: 100%; height: 250px; position: relative; top: 0; } }
+
+        /* Gems 弹窗 Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: rgba(5, 9, 20, 0.98); border: 1px solid var(--secondary); border-radius: 12px; width: 500px; max-width: 90%; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 16px; font-weight: bold; border-bottom: 1px solid rgba(112,0,255,0.3); padding-bottom: 10px; }
+        .modal-close { background: transparent; border: none; color: #64748b; font-size: 20px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { color: var(--danger); }
+        .modal-body { display: flex; flex-direction: column; gap: 12px; }
+        .modal-body label { font-size: 12px; color: #94a3b8; }
+        .modal-body input, .modal-body textarea { background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 12px; color: #fff; font-family: inherit; font-size: 14px; outline: none; transition: 0.3s; }
+        .modal-body input:focus, .modal-body textarea:focus { border-color: var(--secondary); box-shadow: 0 0 10px rgba(112,0,255,0.2); }
+        .modal-body textarea { height: 150px; resize: none; line-height: 1.5; }
+        .btn-save-gem { padding: 12px; background: linear-gradient(90deg, #4f46e5, var(--secondary)); border: none; border-radius: 8px; color: #fff; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 10px; letter-spacing: 1px; }
+        .btn-save-gem:hover { filter: brightness(1.2); box-shadow: 0 0 20px rgba(112,0,255,0.5); }
     </style>
 </head>
 <body>
@@ -64,8 +94,19 @@
     <div class="app-container">
         <div class="sidebar">
             <button class="btn-new-chat" onclick="createNewSession()"><span>+</span> 新建策略对话</button>
+            
+            <div class="gems-header">
+                <span>✦ My Gems (策略预设)</span>
+                <button class="btn-add-gem" onclick="openGemsModal()" title="新建固定提示词">⊕</button>
+            </div>
+            <div class="gems-list" id="gems-list">
+                </div>
+            
+            <div class="divider" style="margin: 5px 0 15px 0;"></div>
+            
             <div class="session-list" id="session-list"></div>
         </div>
+        
         <div class="main-content">
             <div class="container">
                 <h1>Universal Quant Scanner</h1>
@@ -103,7 +144,7 @@
                         <button class="control-btn" onclick="clearBox('queryArea')" title="清空">✕</button>
                     </div>
                 </div>
-                <textarea id="queryArea" placeholder="输入量化筛选条件..."></textarea>
+                <textarea id="queryArea" placeholder="输入量化筛选条件或点击左侧 Gem 快速填入..."></textarea>
             </div>
             <button class="btn-run" onclick="executeCommand()">执行扫描策略 / RUN SCANNER</button>
             <div class="box-container" id="resContainer">
@@ -117,6 +158,7 @@
             </div>
         </div>
     </div>
+
     <button class="btn-log-toggle" onclick="toggleLog()">[ TERMINAL LOGS ]</button>
     <div class="log-panel" id="logPanel">
         <div class="log-panel-header">
@@ -128,6 +170,22 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="gemsModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>✦ 新建 Gem (固化提示词)</span>
+                <button class="modal-close" onclick="closeGemsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <label>Gem 名称</label>
+                <input type="text" id="gemNameInput" placeholder="如：极客硬核滤网 V1">
+                <label>固定筛选条件 / 提示词</label>
+                <textarea id="gemPromptInput" placeholder="在此输入复杂的长串固定筛选指令，例如：&#10;获取所有美股涨幅榜数据...排除市值<20亿..."></textarea>
+                <button class="btn-save-gem" onclick="saveGem()">保存 Gem</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const outputArea = document.getElementById('output-area');
         const sessionListEl = document.getElementById('session-list');
@@ -135,6 +193,7 @@
         const logPanel = document.getElementById('logPanel');
         
         let sessions = JSON.parse(localStorage.getItem('geek_sessions')) || {};
+        let myGems = JSON.parse(localStorage.getItem('geek_custom_gems')) || [];
         let currentSessionId = null;
         let chatHistory = []; 
 
@@ -143,6 +202,7 @@
             document.getElementById('api-main-model').value = localStorage.getItem('geek_api_model') || '';
             document.getElementById('api-main-key').value = localStorage.getItem('geek_api_key') || '';
             renderSidebar();
+            renderGems();
             const sessionIds = Object.keys(sessions);
             if (sessionIds.length > 0) { loadSession(sessionIds[sessionIds.length - 1]); } 
             else { createNewSession(); }
@@ -153,6 +213,63 @@
             localStorage.setItem('geek_api_model', document.getElementById('api-main-model').value.trim());
             localStorage.setItem('geek_api_key', document.getElementById('api-main-key').value.trim());
         }
+
+        /* ================= Gems 逻辑区 ================= */
+        const gemsModal = document.getElementById('gemsModal');
+        const gemNameInput = document.getElementById('gemNameInput');
+        const gemPromptInput = document.getElementById('gemPromptInput');
+        const gemsListEl = document.getElementById('gems-list');
+
+        function openGemsModal() {
+            gemsModal.classList.add('show');
+        }
+
+        function closeGemsModal() {
+            gemsModal.classList.remove('show');
+            gemNameInput.value = '';
+            gemPromptInput.value = '';
+        }
+
+        function saveGem() {
+            const name = gemNameInput.value.trim();
+            const prompt = gemPromptInput.value.trim();
+            if (!name || !prompt) { alert("Gem 名称和提示词内容不能为空！"); return; }
+            
+            myGems.push({ name, prompt });
+            localStorage.setItem('geek_custom_gems', JSON.stringify(myGems));
+            renderGems();
+            closeGemsModal();
+        }
+
+        function renderGems() {
+            gemsListEl.innerHTML = '';
+            myGems.forEach((gem, index) => {
+                const item = document.createElement('div');
+                item.className = 'gem-item';
+                // 点击名称将预设词填入输入框
+                item.innerHTML = `
+                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="点击载入此 Gem" onclick="applyGem(${index})">✨ ${gem.name}</div>
+                    <button class="btn-del-session" onclick="deleteGem(event, ${index})" title="删除此 Gem">✕</button>
+                `;
+                gemsListEl.appendChild(item);
+            });
+        }
+
+        function applyGem(index) {
+            const gem = myGems[index];
+            document.getElementById('queryArea').value = gem.prompt;
+            appendSysLog(`已载入自定义 Gem 提示词: ${gem.name}`);
+        }
+
+        function deleteGem(event, index) {
+            event.stopPropagation();
+            if (confirm("确定要删除这个 Gem 预设吗？")) {
+                myGems.splice(index, 1);
+                localStorage.setItem('geek_custom_gems', JSON.stringify(myGems));
+                renderGems();
+            }
+        }
+        /* =============================================== */
 
         function toggleLog() { logPanel.classList.toggle('show'); }
         function appendSysLog(text, type = 'info') {
@@ -230,7 +347,7 @@
         }
 
         // ==========================================================
-        // 核心进化：纯粹的 Raw Data -> LLM Inference 模型
+        // 核心执行逻辑
         // ==========================================================
         async function executeCommand() {
             const queryInput = document.getElementById('queryArea');
