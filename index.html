@@ -50,8 +50,10 @@
         h2 { font-size: 1.2rem; text-align: left; margin-bottom: 15px; color: var(--secondary); text-shadow: 0 0 8px rgba(112,0,255,0.4); }
         
         .config-group { margin-bottom: 15px; } .config-group label { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
-        .input-row { display: flex; gap: 10px; } .config-group input { flex: 1; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border); border-radius: 6px; padding: 10px 15px; color: #fff; font-size: 14px; outline: none; transition: 0.3s; }
-        .config-group input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+        .input-row { display: flex; gap: 10px; } 
+        .config-group input, .config-group select { flex: 1; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border); border-radius: 6px; padding: 10px 15px; color: #fff; font-size: 14px; outline: none; transition: 0.3s; }
+        .config-group select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%2300f0ff'><path d='M0 0h10L5 6z'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; }
+        .config-group input:focus, .config-group select:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
         .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 20px 0; }
         .btn-delete { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); border-radius: 6px; color: var(--danger); width: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 16px; }
         .btn-delete:hover { background: var(--danger); color: #fff; }
@@ -237,16 +239,39 @@
                     </div>
                     
                     <div class="divider"></div>
-                    <h2>Resolution Matrix</h2>
-                    <div class="config-group" style="margin-top:-5px;">
-                        <label>✦ 输出分辨率 / 画质选择</label>
-                        <input type="text" id="video-quality" list="quality-options" placeholder="默认适配最优画质...">
-                        <datalist id="quality-options">
-                            <option value="480p SD"></option>
-                            <option value="720p HD"></option>
-                            <option value="1080p FHD"></option>
-                            <option value="4K UHD"></option>
-                        </datalist>
+                    <h2>Resolution & Canvas Parameters</h2>
+                    <div class="input-row" style="margin-top:5px;">
+                        <div class="config-group" style="flex: 1;">
+                            <label>✦ 画面比例 (Aspect Ratio)</label>
+                            <select id="video-aspect-ratio" onchange="saveConfigToLocal()">
+                                <option value="16:9">16:9 宽屏 (默认)</option>
+                                <option value="9:16">9:16 竖屏 (短视频)</option>
+                                <option value="1:1">1:1 正方形</option>
+                                <option value="4:3">4:3 传统</option>
+                                <option value="3:4">3:4 纵向</option>
+                                <option value="2:1">2:1 横幅</option>
+                                <option value="auto">auto 智能自适应</option>
+                            </select>
+                        </div>
+                        <div class="config-group" style="flex: 1;">
+                            <label>✦ 视频时长 (Duration)</label>
+                            <select id="video-duration" onchange="saveConfigToLocal()">
+                                <option value="6">6 秒输出 (快刷)</option>
+                                <option value="10">10 秒输出 (长分镜)</option>
+                                <option value="5">5 秒输出 (标准)</option>
+                                <option value="15">15 秒输出 (极限满配)</option>
+                            </select>
+                        </div>
+                        <div class="config-group" style="flex: 1;">
+                            <label>✦ 分辨率/尺寸等级 (Resolution)</label>
+                            <select id="video-quality" onchange="saveConfigToLocal()">
+                                <option value="720p">720p HD 高清</option>
+                                <option value="480p">480p SD 标清</option>
+                                <option value="1080p">1080p FHD 全高清</option>
+                                <option value="1k">1K 级 (图模专用)</option>
+                                <option value="2k">2K 级 (图模顶配)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
@@ -318,6 +343,9 @@
             document.getElementById('api-video-url').value = localStorage.getItem('geek_video_url') || '';
             document.getElementById('api-video-model').value = localStorage.getItem('geek_video_model') || '';
             document.getElementById('api-video-key').value = localStorage.getItem('geek_video_key') || '';
+            if(localStorage.getItem('geek_video_aspect')) document.getElementById('video-aspect-ratio').value = localStorage.getItem('geek_video_aspect');
+            if(localStorage.getItem('geek_video_duration')) document.getElementById('video-duration').value = localStorage.getItem('geek_video_duration');
+            if(localStorage.getItem('geek_video_resolution')) document.getElementById('video-quality').value = localStorage.getItem('geek_video_resolution');
             renderSidebar(); renderGems(); renderVideoAssetsPool();
             const sessionIds = Object.keys(sessions);
             if (sessionIds.length > 0) { loadSession(sessionIds[sessionIds.length - 1]); } else { createNewSession(); }
@@ -330,6 +358,9 @@
             localStorage.setItem('geek_video_url', document.getElementById('api-video-url').value.trim());
             localStorage.setItem('geek_video_model', document.getElementById('api-video-model').value.trim());
             localStorage.setItem('geek_video_key', document.getElementById('api-video-key').value.trim());
+            localStorage.setItem('geek_video_aspect', document.getElementById('video-aspect-ratio').value);
+            localStorage.setItem('geek_video_duration', document.getElementById('video-duration').value);
+            localStorage.setItem('geek_video_resolution', document.getElementById('video-quality').value);
         }
 
         function switchWorkspace(targetId, tabElement) {
@@ -415,7 +446,7 @@
 
         function removeVideoAsset(index) { videoAssets.splice(index, 1); renderVideoAssetsPool(); }
 
-        /* ================= 震撼黑科技：智能 @ 联想补全监听器 ================= */
+        /* ================= 智能 @ 联想补全监听器 ================= */
         const videoTextArea = document.getElementById('videoQueryArea');
         const mentionMenu = document.getElementById('mentionMenu');
         let mentionState = { active: false, query: '', startIndex: -1, selectedIndex: 0, filteredAssets: [] };
@@ -500,7 +531,7 @@
             return new Promise((resolve) => {
                 const video = document.createElement('video'); video.autoplay = true; video.muted = true; video.playsInline = true; video.src = URL.createObjectURL(file);
                 video.onloadeddata = () => video.currentTime = 0.5;
-                video.onseeked = () => { const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0, c.width, c.height); resolve(c.toDataURL('image/jpeg', 0.8)); };
+                video.onseeked = () => { const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0, c.width, c.height); resolve(c.to下URL('image/jpeg', 0.8)); };
             });
         }
 
@@ -575,7 +606,7 @@
                         if (res.ok) { const txt = await res.text(); combinedRawData += `【节点 ${i + 1}数据】:\n${txt.substring(0, 30000)}\n\n`; }
                     }
                 }
-                const finalPrompt = `【Quant Scanner 指令】：用户动态条件：\n${query}\n\n【辅助节点获取的数据】（Raw Data）：\n${combinedRawData}\n\n【输出要求】：数据时间: ${runTimestamp} UTC\n行情来源: ${dataSourceMeta}\n扫描股票数量: 全市场扫描\n请据此推演独立完成用户要求的量化清洗排序，且不要列出被排除公司。`;
+                const finalPrompt = `【Quant Scanner 指令】：用户动态条件：\n${query}\n\n【辅助节点获取的数据】（Raw Data）：\n${combinedRawData}\n\n【输出要求】：数据时间: ${runTimestamp} UTC\n行情来源: ${dataSourceMeta}\n扫描股票数量: 全市场扫描\n请据此推演独立完成用户要求的量化清洗排序，且不要列出被排除 company。`;
                 let finalContent = currentMediaBase64 ? [{ type: "text", text: finalPrompt }, { type: "image_url", image_url: { url: currentMediaBase64 } }] : finalPrompt;
                 chatHistory.push({ role: "user", content: finalContent });
                 const response = await fetch(apiUrl, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: apiModel, messages: chatHistory }) });
@@ -599,7 +630,11 @@
             let videoUrl = document.getElementById('api-video-url').value.trim() || document.getElementById('api-main-url').value.trim();
             let videoModel = document.getElementById('api-video-model').value.trim() || document.getElementById('api-main-model').value.trim();
             let videoKey = document.getElementById('api-video-key').value.trim() || document.getElementById('api-main-key').value.trim();
-            let qualitySetting = document.getElementById('video-quality').value.trim(); 
+            
+            // 获取控制卡槽新参数
+            let aspectSetting = document.getElementById('video-aspect-ratio').value;
+            let durationSetting = parseInt(document.getElementById('video-duration').value);
+            let resolutionSetting = document.getElementById('video-quality').value;
 
             if (!scriptPrompt && videoAssets.length === 0) { alert("视频剧本描述不能为空！"); return; }
             if (!videoUrl || !videoModel || !videoKey) { alert("鉴权卡槽（Key）配置缺失！"); return; }
@@ -627,20 +662,28 @@
                     }
                 }
 
-                if (qualitySetting && scriptPrompt) {
-                    scriptPrompt += ` (Generate in ${qualitySetting} quality)`;
-                }
-
-                // 核心：根据 URL 自动适配底层 API 协议 (兼容 Grok Imagine / Images API / 通用 Chat)
+                // 核心：根据 URL 自动适配底层 API 协议 (超级防弹版)
                 let payload = {};
                 
-                if (videoUrl.includes("images/generations")) {
-                    appendSysLog("路由匹配：标准图像生成端点 (Images API)。");
+                // 只要网址里带有 image, video 或 generation，就一律走 prompt 格式
+                if (videoUrl.toLowerCase().includes("image") || videoUrl.toLowerCase().includes("video") || videoUrl.toLowerCase().includes("generation")) {
+                    appendSysLog("路由匹配：标准图像/视频生成端点。");
+                    
                     payload = {
                         model: videoModel,
-                        prompt: scriptPrompt || "Generate an image"
+                        prompt: scriptPrompt || "Generate media",
+                        aspect_ratio: aspectSetting,
+                        resolution: resolutionSetting
                     };
+                    
+                    // 只有在调用真实的视频模型/视频端点时，才注入 duration 时长参数
+                    if (videoUrl.toLowerCase().includes("video") || videoModel.toLowerCase().includes("video")) {
+                        payload.duration = durationSetting;
+                        appendSysLog(`参数装填: 时长设置为 ${durationSetting} 秒。`);
+                    }
+
                     if (primaryImageBase64) { payload.image_url = primaryImageBase64; }
+                    appendSysLog(`参数装填: 宽高比 [${aspectSetting}], 分辨率 [${resolutionSetting}]`);
                 } 
                 else {
                     appendSysLog("路由匹配：通用对话/多模态端点 (Chat/Completions API)。");
@@ -672,7 +715,7 @@
                 const result = await response.json();
                 appendSysLog(`投递成功，解析网关回传结果...`);
 
-                let mediaUrlSrc = result.video_url || result.image_url || result.url || (result.data && result.data[0]?.url) || (result.urls && result.urls[0]) || "";
+                let mediaUrlSrc = result.video_url || result.image_url || result.url || (result.video && result.video.url) || (result.data && result.data[0]?.url) || (result.urls && result.urls[0]) || "";
                 if (!mediaUrlSrc && result.choices && result.choices[0]?.message?.content) {
                     let content = result.choices[0].message.content;
                     let urlMatch = content.match(/https?:\/\/[^\s"']+/);
@@ -703,7 +746,7 @@
                             
                             if (checkRes.ok) {
                                 let checkData = await checkRes.json();
-                                let finalUrl = checkData.video_url || checkData.image_url || checkData.url || (checkData.data && checkData.data[0]?.url) || "";
+                                let finalUrl = checkData.video_url || checkData.image_url || checkData.url || (checkData.video && checkData.video.url) || (checkData.data && checkData.data[0]?.url) || "";
                                 
                                 if (finalUrl) {
                                     clearInterval(checkInterval);
