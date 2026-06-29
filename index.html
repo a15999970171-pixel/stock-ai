@@ -8,7 +8,6 @@
         :root { --primary: #00f0ff; --secondary: #7000ff; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --border: rgba(0, 240, 255, 0.3); --danger: #ef4444; --text: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'PingFang SC', sans-serif; }
         
-        /* 移动端细滚动条重置 */
         * { scrollbar-width: thin; scrollbar-color: rgba(0, 240, 255, 0.2) transparent; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-thumb { background-color: rgba(0, 240, 255, 0.2); border-radius: 10px; }
@@ -19,10 +18,8 @@
         .cyber-bg::before { content: ""; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg); animation: grid-move 10s linear infinite; }
         @keyframes grid-move { from { background-position: 0 0; } to { background-position: 0 40px; } }
         
-        /* 双端响应式大容器 */
         .app-container { display: flex; width: 100%; max-width: 1400px; gap: 20px; align-items: flex-start; }
         
-        /* 左侧边栏 */
         .sidebar { width: 280px; flex-shrink: 0; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); position: sticky; top: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); z-index: 10; }
         .btn-new-chat { width: 100%; padding: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
         .btn-new-chat:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
@@ -95,8 +92,8 @@
         .box-container.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: 100vw; z-index: 9999; border-radius: 0; margin: 0; } .box-container.fullscreen textarea { height: calc(100vh - 120px); font-size: 18px; }
         
         .fancy-upload-bar { display: flex; align-items: center; gap: 10px; padding: 8px 15px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); }
-        .btn-fancy-upload { display: flex; align-items: center; gap: 6px; background: rgba(112,0,255,0.15); border: 1px dashed var(--secondary); padding: 6px 12px; border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .btn-fancy-upload:hover { background: rgba(112,0,255,0.3); border-color: var(--primary); text-shadow: 0 0 5px var(--primary); }
+        .btn-fancy-upload { display: flex; align-items: center; gap: 6px; background: rgba(112,0,255,0.15); border: 1px solid var(--secondary); padding: 6px 12px; border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-fancy-upload:hover { background: var(--secondary); box-shadow: 0 0 25px rgba(112, 0, 255, 0.8); text-shadow: 0 0 5px #fff; }
         
         .asset-pills-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 15px; background: rgba(0,0,0,0.1); min-height: 40px; }
         .asset-pill { display: flex; align-items: center; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(112,0,255,0.4); border-radius: 20px; padding: 3px 4px 3px 8px; font-size: 12px; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); transition: 0.2s; }
@@ -329,8 +326,9 @@
                             <label>✦ 视频时长 (Duration)</label>
                             <select id="video-duration" onchange="syncVideoManifest()">
                                 <option value="6">6 秒输出</option>
-                                <option value="10">10 秒输出</option>
                                 <option value="5">5 秒输出</option>
+                                <option value="10">10 秒输出</option>
+                                <option value="15">15 秒输出</option>
                             </select>
                         </div>
                         <div class="config-group" style="flex: 1;">
@@ -374,8 +372,14 @@
                     </div>
                 </div>
                 <button class="btn-run" style="background: linear-gradient(90deg, var(--primary), var(--secondary));" onclick="executeVideoGeneration()">渲染并生成媒体 / GENERATE</button>
+                
                 <div class="box-container">
-                    <div class="box-header"><span class="box-title" style="color:var(--secondary);">CREATION_OUTPUT (渲染播放区)</span></div>
+                    <div class="box-header">
+                        <span class="box-title" style="color:var(--secondary);">CREATION_OUTPUT (渲染播放区)</span>
+                        <div class="controls">
+                            <button class="control-btn" onclick="exportVideo()" title="一键导出生成的视频/媒体文件">💾</button>
+                        </div>
+                    </div>
                     <div id="video-output-area"><div class="msg-sys">渲染引擎就绪。生成成功的媒体实体将在此处挂载原生播放器。</div></div>
                 </div>
             </div>
@@ -441,6 +445,9 @@
         let gems = JSON.parse(localStorage.getItem('geek_gems')) || [];
         let currentSessionId = null; let chatHistory = [];
         
+        // 🚀 新增：专门缓存当前生成的视频或图片媒体地址，供一键导出使用
+        let currentGeneratedMediaUrl = null; 
+
         let assetsMap = { quant: [], video: [] };
         let mentionStates = {
             quant: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'queryArea', menuId: 'quantMentionMenu' },
@@ -497,7 +504,7 @@
             logContent.appendChild(entry); logContent.scrollTop = logContent.scrollHeight;
         }
 
-        /* ======== 🚀 API 批量导入核心解析逻辑 ======== */
+        /* API 批量导入核心解析逻辑 */
         function openImportModal() { document.getElementById('importModal').classList.add('show'); }
         function closeImportModal() { document.getElementById('importModal').classList.remove('show'); document.getElementById('importArea').value = ''; }
         
@@ -535,20 +542,15 @@
             closeImportModal();
             appendSysLog(`✔ 批量导入成功！共解析并挂载了 ${lines.length} 条配置。`);
         }
-        /* ================================================== */
 
-        /* ======== 🚀 新增：一键导出为原生带样式 HTML 文件 ======== */
+        /* 一键导出报告为 HTML */
         function exportReport() {
             const outputArea = document.getElementById('output-area');
             if (!outputArea.innerHTML.trim()) {
                 alert("当前没有可导出的分析报告内容！");
                 return;
             }
-
-            // 获取生成的 HTML 元素（其中已完美包含了 base64 的图片和排版样式）
             const reportContent = outputArea.innerHTML;
-            
-            // 构建带默认样式基座的下载母版
             const exportTemplate = `
             <!DOCTYPE html>
             <html lang="zh-CN">
@@ -568,29 +570,39 @@
             </head>
             <body>
                 <h1>Universal Quant 自动化分析报告</h1>
-                <div class="report-content">
-                    ${reportContent}
-                </div>
+                <div class="report-content">${reportContent}</div>
                 <div class="footer">生成时间: ${new Date().toLocaleString()} (由 Universal Quant Terminal 联邦渲染)</div>
             </body>
-            </html>
-            `;
-
-            // 创建 Blob 对象并触发下载
+            </html>`;
             const blob = new Blob([exportTemplate], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            // 自动命名为带时间戳的文件
             a.download = `Quant_Report_${new Date().getTime()}.html`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
             appendSysLog('✔ 分析报告已成功打包！请在弹出的窗口中选择文件夹保存。');
         }
-        /* ================================================== */
+
+        /* 🚀 新增：一键导出生成的视频与流媒体文件 */
+        function exportVideo() {
+            if (!currentGeneratedMediaUrl) {
+                alert("当前播放区没有检测到任何生成的视频或媒体资产！");
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = currentGeneratedMediaUrl;
+            a.target = '_blank';
+            let ext = "mp4";
+            if (currentGeneratedMediaUrl.includes(".png") || currentGeneratedMediaUrl.includes("image") || currentGeneratedMediaUrl.startsWith("data:image")) ext = "png";
+            a.download = `Quant_Media_Output_${new Date().getTime()}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            appendSysLog('✔ 媒体文件下载指令已触发！如果未自动弹出保存窗口，可在打开的新标签页中右键选择另存为。');
+        }
 
         async function handleAssetSelect(e, scope) {
             const files = e.target.files; if (!files || files.length === 0) return;
@@ -847,7 +859,7 @@
             outputArea.innerHTML = ''; 
         }
         
-        function loadSession(id) {
+        loadSession = function(id) {
             currentSessionId = id; 
             chatHistory = sessions[id].history || []; 
             
@@ -958,6 +970,7 @@
             }
         }
 
+        /* 视频创作中心：全量多模态输出与联动导出核心实现 */
         async function executeVideoGeneration() {
             let scriptPrompt = document.getElementById('videoQueryArea').value.trim();
             let videoUrl = document.getElementById('api-video-url').value.trim() || document.getElementById('api-main-url').value.trim();
@@ -1008,7 +1021,8 @@
 
                 if (!response.ok) { const errText = await response.text(); throw new Error(`网关异常 状态码: ${response.status} - ${errText.substring(0, 120)}`); }
                 const result = await response.json();
-                
+                appendSysLog(`投递成功，解析网关回传结果...`);
+
                 let mediaUrlSrc = result.video_url || result.image_url || result.url || (result.video && result.video.url) || (result.data && result.data[0]?.url) || "";
                 if (!mediaUrlSrc && result.choices && result.choices[0]?.message?.content) {
                     let content = result.choices[0].message.content; let urlMatch = content.match(/https?:\/\/[^\s"']+/); if (urlMatch) mediaUrlSrc = urlMatch[0];
@@ -1016,6 +1030,7 @@
                 let taskId = result.id || result.task_id || result.request_id || "";
 
                 if (mediaUrlSrc) {
+                    currentGeneratedMediaUrl = mediaUrlSrc; // 💾 同步挂载导出变量
                     vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(mediaUrlSrc, videoModel)}<div style="font-size:11px; color:#10b981;">✔ 全量媒体渲染成功！</div></div>`;
                 } else if (taskId && !mediaUrlSrc) {
                     vOutput.innerHTML = `<div style="width:100%; font-size:13px;"><div style="color:#f59e0b;">✔ 任务派发成功！ID: ${taskId}</div><div id="polling-status" style="color:#00f0ff; margin-top:10px; font-weight:bold;">正在云端异步渲染融合中... ⏳</div></div>`;
@@ -1028,7 +1043,11 @@
                             if (checkRes.ok) {
                                 let checkData = await checkRes.json();
                                 let finalUrl = checkData.video_url || checkData.image_url || checkData.url || (checkData.video && checkData.video.url) || "";
-                                if (finalUrl) { clearInterval(checkInterval); vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(finalUrl, videoModel)}</div>`; }
+                                if (finalUrl) { 
+                                    clearInterval(checkInterval); 
+                                    currentGeneratedMediaUrl = finalUrl; // 💾 同步挂载异步轮询出的导出变量
+                                    vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(finalUrl, videoModel)}</div>`; 
+                                }
                             }
                         } catch (e) {}
                     }, 5000);
