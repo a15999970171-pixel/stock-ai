@@ -545,7 +545,6 @@
     </div>
 
     <script>
-        // DOM 变量
         const outputArea = document.getElementById('output-area');
         const logContent = document.getElementById('logContent');
         const logPanel = document.getElementById('logPanel');
@@ -555,9 +554,8 @@
         let currentSessionId = null; let chatHistory = [];
         
         let currentGeneratedMediaUrl = null; 
-        let currentGeneratedImageUrl = null; // 🚀 图像矩阵专属导出变量
+        let currentGeneratedImageUrl = null; 
 
-        // 🚀 资产池扩充：新增 image 工作区
         let assetsMap = { quant: [], video: [], image: [] };
         let mentionStates = {
             quant: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'queryArea', menuId: 'quantMentionMenu' },
@@ -574,7 +572,6 @@
             document.getElementById('api-video-model').value = localStorage.getItem('geek_video_model') || '';
             document.getElementById('api-video-key').value = localStorage.getItem('geek_video_key') || '';
             
-            // 🚀 图像矩阵初始读取
             document.getElementById('api-image-url').value = localStorage.getItem('geek_image_url') || '';
             document.getElementById('api-image-model').value = localStorage.getItem('geek_image_model') || '';
             document.getElementById('api-image-key').value = localStorage.getItem('geek_image_key') || '';
@@ -637,7 +634,6 @@
         function openImportModal() { document.getElementById('importModal').classList.add('show'); }
         function closeImportModal() { document.getElementById('importModal').classList.remove('show'); document.getElementById('importArea').value = ''; }
         
-        // 🚀 API 解析适配第 4 行
         function executeImport() {
             const importText = document.getElementById('importArea').value;
             const lines = importText.split('\n').map(l => l.trim()).filter(l => l !== '');
@@ -646,7 +642,7 @@
             if (lines[0]) document.getElementById('api-main-url').value = lines[0];
             if (lines[1]) document.getElementById('api-main-model').value = lines[1];
             if (lines[2]) document.getElementById('api-video-url').value = lines[2];
-            if (lines[3]) document.getElementById('api-image-url').value = lines[3]; // 图像端点
+            if (lines[3]) document.getElementById('api-image-url').value = lines[3]; 
 
             if (lines.length > 4) {
                 const wrapper = document.getElementById('dynamic-nodes-wrapper');
@@ -691,7 +687,6 @@
             a.download = `Quant_Media_Output_${new Date().getTime()}.${ext}`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
-        // 🚀 新增：图像导出函数
         function exportImage() {
             if (!currentGeneratedImageUrl) { alert("当前渲染区没有检测到任何图像资产！"); return; }
             const a = document.createElement('a'); a.href = currentGeneratedImageUrl; a.target = '_blank';
@@ -819,7 +814,6 @@
             });
         }
 
-        // 🚀 新增：同步图像生图矩阵清单
         function syncImageManifest() {
             saveConfigToLocal(); const prompt = document.getElementById('imageQueryArea').value.trim();
             const grid = document.getElementById('image-manifest-grid');
@@ -956,7 +950,18 @@
 
                 chatHistory.push({ role: "assistant", content: aiAnswer }); sessions[currentSessionId].history = chatHistory; saveToLocal(); renderSidebar();
                 if(outputArea) outputArea.innerHTML += `<div class="msg-ai">${aiAnswer}</div>`;
-            } catch (error) { if(outputArea) outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; }
+            } catch (error) { 
+                let errorMsg = error.message;
+                if (errorMsg.includes("Failed to fetch")) {
+                    errorMsg = `Failed to fetch (网络阻断 / 跨域拦截)。<br>
+                    <span style="color:#94a3b8; font-weight:normal; font-size:12px;">
+                    ▶ 原因 1：官方 API 严禁浏览器直接访问 (CORS 跨域限制)。<br>
+                    ▶ 原因 2：API 地址填写错误，或当前网络无法连通该端点。<br>
+                    💡 解决：请使用【API 中转网关】代替官方地址，或安装浏览器 Allow CORS 插件强行绕过。
+                    </span>`;
+                }
+                if(outputArea) outputArea.innerHTML += `<div class="msg-error">[运算终止] ${errorMsg}</div>`; 
+            }
         }
 
         // ================= 视频创作引擎 =================
@@ -1016,29 +1021,88 @@
                 } else if (taskId && !mediaUrlSrc) {
                     vOutput.innerHTML = `<div style="width:100%; font-size:13px;"><div style="color:#f59e0b;">✔ 任务派发成功！ID: ${taskId}</div><div id="polling-status" style="color:#00f0ff; margin-top:10px; font-weight:bold;">正在云端异步渲染融合中... ⏳</div></div>`;
                     let pollCount = 0;
+                    
+                    // 🚀 终极轮询引擎：带日志透视和全量兼容
                     let checkInterval = setInterval(async () => {
-                        pollCount++; if (pollCount > 60) { clearInterval(checkInterval); return; }
+                        pollCount++; 
+                        // 扩容到 120 次 (10分钟超时)，防止大视频没画完
+                        if (pollCount > 120) { 
+                            clearInterval(checkInterval); 
+                            document.getElementById('polling-status').innerHTML = `<span style="color:#ef4444;">❌ 查询超时 (已等待10分钟)。任务可能仍在云端处理，请稍后带上 ID 手动查询。</span>`;
+                            return; 
+                        }
+                        
                         try {
-                            let pollUrl = videoUrl.includes('/generations') ? videoUrl.replace('/generations', `/${taskId}`) : `${videoUrl}/${taskId}`;
-                            let checkRes = await fetch(pollUrl, { method: "GET", headers: { "Authorization": `Bearer ${videoKey}`, "Content-Type": "application/json" } });
+                            // 智能适配各种视频 API 的查件路由
+                            let pollUrl = videoUrl;
+                            if (videoUrl.includes('/generations')) {
+                                pollUrl = videoUrl.replace('/generations', `/${taskId}`);
+                            } else if (videoUrl.includes('/tasks')) {
+                                pollUrl = `${videoUrl}/${taskId}`;
+                            } else {
+                                pollUrl = `${videoUrl}/${taskId}`;
+                            }
+
+                            let checkRes = await fetch(pollUrl, { 
+                                method: "GET", 
+                                headers: { "Authorization": `Bearer ${videoKey}`, "Content-Type": "application/json" } 
+                            });
+                            
                             if (checkRes.ok) {
                                 let checkData = await checkRes.json();
-                                let finalUrl = checkData.video_url || checkData.image_url || checkData.url || (checkData.video && checkData.video.url) || "";
+                                
+                                // 打印进度到日志，让你知道它不是在装死
+                                let currentStatus = checkData.status || checkData.state || checkData.task_status || "processing";
+                                appendSysLog(`[轮询 #${pollCount}] 状态: ${currentStatus}`);
+                                document.getElementById('polling-status').innerText = `正在云端渲染中... 第 ${pollCount} 次查询 (当前状态: ${currentStatus}) ⏳`;
+
+                                // 暴力兼容市面上几乎所有视频 API 的回包路径
+                                let finalUrl = checkData.video_url || 
+                                               checkData.image_url || 
+                                               checkData.url || 
+                                               (checkData.video && checkData.video.url) || 
+                                               (checkData.output && checkData.output.video_url) || 
+                                               (checkData.data && checkData.data.video_url) ||
+                                               "";
+                                               
                                 if (finalUrl) { 
                                     clearInterval(checkInterval); 
                                     currentGeneratedMediaUrl = finalUrl; 
                                     vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(finalUrl, videoModel)}</div>`; 
+                                    appendSysLog(`✔ 视频渲染大功告成！已捕获原生直链。`);
+                                } else if (currentStatus.toLowerCase() === "failed" || currentStatus.toLowerCase() === "error") {
+                                    clearInterval(checkInterval);
+                                    let errorMsg = checkData.error || checkData.message || "未知原因";
+                                    document.getElementById('polling-status').innerHTML = `<span style="color:#ef4444;">❌ 渲染失败: ${errorMsg}</span>`;
+                                    appendSysLog(`❌ 云端引擎报错: ${errorMsg}`, "error");
                                 }
+                            } else {
+                                // 如果查件地址报错（比如 404），直接抓取出来
+                                let errText = await checkRes.text();
+                                appendSysLog(`[轮询 #${pollCount}] 请求受阻 (HTTP ${checkRes.status}): ${errText}`, "warn");
                             }
-                        } catch (e) {}
+                        } catch (e) {
+                            appendSysLog(`[轮询 #${pollCount}] 网络异常: ${e.message}`, "error");
+                        }
                     }, 5000);
                 } else {
                     vOutput.innerHTML = `<pre style="background:#000; padding:10px; border-radius:6px; color:#10b981; max-height:200px; overflow:auto;">${JSON.stringify(result, null, 2)}</pre>`;
                 }
-            } catch (e) { vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${e.message}</div>`; }
+            } catch (e) { 
+                let errorMsg = e.message;
+                if (errorMsg.includes("Failed to fetch")) {
+                    errorMsg = `Failed to fetch (网络阻断 / 跨域拦截)。<br>
+                    <span style="color:#94a3b8; font-weight:normal; font-size:12px;">
+                    ▶ 原因 1：官方 API 严禁浏览器直接访问 (CORS 跨域限制)。<br>
+                    ▶ 原因 2：API 地址填写错误，或当前网络无法连通该端点。<br>
+                    💡 解决：请使用【API 中转网关】代替官方地址，或安装浏览器 Allow CORS 插件强行绕过。
+                    </span>`;
+                }
+                vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${errorMsg}</div>`; 
+            }
         }
 
-        // ================= 🚀 新增：图像生图引擎 =================
+        // ================= 图像生图引擎 =================
         async function executeImageGeneration() {
             let scriptPrompt = document.getElementById('imageQueryArea').value.trim();
             let imageUrl = document.getElementById('api-image-url').value.trim() || document.getElementById('api-main-url').value.trim();
@@ -1066,21 +1130,17 @@
                 });
 
                 let payload = {};
-                // 自适应标准 DALL-E / xAI 生图接口
                 if (imageUrl.toLowerCase().includes("image") || imageUrl.toLowerCase().includes("generation") || imageModel.toLowerCase().includes("dall")) {
                     payload = { model: imageModel, prompt: scriptPrompt };
                     
-                    // 兼容常规尺寸与特殊参数
                     if(qualitySetting === '1024x1024') { payload.size = "1024x1024"; } 
                     else { payload.aspect_ratio = aspectSetting; payload.quality = qualitySetting; }
                     
-                    // 特殊透传动图/格式参数
                     payload.output_format = formatSetting.toLowerCase();
                     if(formatSetting === 'GIF') { payload.is_gif = true; scriptPrompt += " (Generate as an animated GIF loop)"; payload.prompt = scriptPrompt; }
 
-                    if (boundImages.length > 0) { payload.image_url = boundImages[0]; payload.image = boundImages[0]; } // 兼容不同API垫图卡槽
+                    if (boundImages.length > 0) { payload.image_url = boundImages[0]; payload.image = boundImages[0]; } 
                 } else {
-                    // 如果用的是通用大模型，强制让它返回 Markdown 格式图
                     payload.model = imageModel;
                     let mContent = [{ type: "text", text: `[SYSTEM: Generate an image. Format: ${formatSetting}. Aspect: ${aspectSetting}]\n\nUser Request: ${scriptPrompt}` }];
                     boundImages.forEach(img => mContent.push({ type: "image_url", image_url: { url: img } }));
@@ -1092,7 +1152,6 @@
                 
                 const result = await response.json();
                 
-                // 深度解析常见的图像 URL 嵌套结构
                 let parsedImageUrl = result.image_url || result.url || (result.data && result.data[0]?.url) || (result.images && result.images[0]?.url) || "";
                 
                 if (!parsedImageUrl && result.choices && result.choices[0]?.message?.content) {
@@ -1106,7 +1165,18 @@
                 } else {
                     vOutput.innerHTML = `<pre style="background:#000; padding:10px; border-radius:6px; color:#10b981; max-height:200px; overflow:auto;">[未找到直链, 返回报文]\n${JSON.stringify(result, null, 2)}</pre>`;
                 }
-            } catch (e) { vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${e.message}</div>`; }
+            } catch (e) { 
+                let errorMsg = e.message;
+                if (errorMsg.includes("Failed to fetch")) {
+                    errorMsg = `Failed to fetch (网络阻断 / 跨域拦截)。<br>
+                    <span style="color:#94a3b8; font-weight:normal; font-size:12px;">
+                    ▶ 原因 1：官方 API 严禁浏览器直接访问 (CORS 跨域限制)。<br>
+                    ▶ 原因 2：API 地址填写错误，或当前网络无法连通该端点。<br>
+                    💡 解决：请使用【API 中转网关】代替官方地址，或安装浏览器 Allow CORS 插件强行绕过。
+                    </span>`;
+                }
+                vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${errorMsg}</div>`; 
+            }
         }
     </script>
 </body>
