@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Quant & Video Dashboard - Ultimate</title>
+    <title>Universal Quant & Video Dashboard - Dual Matrix Pro</title>
     <style>
         :root { --primary: #00f0ff; --secondary: #7000ff; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --border: rgba(0, 240, 255, 0.3); --danger: #ef4444; --text: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'PingFang SC', sans-serif; }
+        
+        /* 移动端细滚动条重置 */
+        * { scrollbar-width: thin; scrollbar-color: rgba(0, 240, 255, 0.2) transparent; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(0, 240, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+
         body { background-color: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; display: flex; justify-content: center; padding: 20px; }
         .cyber-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #020617 100%); }
         .cyber-bg::before { content: ""; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg); animation: grid-move 10s linear infinite; }
         @keyframes grid-move { from { background-position: 0 0; } to { background-position: 0 40px; } }
+        
+        /* 双端响应式大容器 */
         .app-container { display: flex; width: 100%; max-width: 1400px; gap: 20px; align-items: flex-start; }
         
         /* 左侧边栏 */
-        .sidebar { width: 280px; flex-shrink: 0; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); position: sticky; top: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); }
+        .sidebar { width: 280px; flex-shrink: 0; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); position: sticky; top: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); z-index: 10; }
         .btn-new-chat { width: 100%; padding: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
         .btn-new-chat:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
         .gems-header { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 13px; font-weight: bold; margin-bottom: 10px; padding: 0 5px; flex-shrink: 0; }
         .btn-add-gem { background: transparent; border: none; color: var(--secondary); font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-add-gem:hover { color: #fff; text-shadow: 0 0 8px var(--secondary); }
-        .gems-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; flex-shrink: 0; max-height: 200px; overflow-y: auto; padding-right: 5px; }
+        .gems-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; flex-shrink: 0; max-height: 180px; overflow-y: auto; padding-right: 5px; }
         .gem-item { background: rgba(112, 0, 255, 0.1); border: 1px dashed rgba(112, 0, 255, 0.4); border-radius: 6px; padding: 10px; cursor: pointer; font-size: 13px; color: #cbd5e1; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
         .gem-item:hover { background: rgba(112, 0, 255, 0.25); border-color: var(--secondary); color: #fff; }
         .session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
-        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; } ::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.3); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
         .session-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
         .session-item:hover { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
         .session-item.active { border-color: var(--primary); background: rgba(0, 240, 255, 0.1); border-left: 4px solid var(--primary); }
@@ -65,19 +73,10 @@
         .box-title { font-size: 13px; color: var(--primary); font-weight: bold; } .query-title { color: #f59e0b; }
         .controls { display: flex; gap: 8px; } .control-btn { width: 26px; height: 26px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s; }
         .control-btn:hover { background: rgba(255,255,255,0.2); }
-        textarea { width: 100%; height: 100px; background: transparent; border: none; color: #fff; padding: 15px; font-size: 15px; line-height: 1.6; resize: none; outline: none; }
+        textarea { width: 100%; height: 120px; background: transparent; border: none; color: #fff; padding: 15px; font-size: 15px; line-height: 1.6; resize: none; outline: none; }
         
-        /* 量化终端单图预览区 */
-        .media-preview-container { display: none; padding: 0 15px 15px 15px; gap: 10px; }
-        .media-preview-container.show { display: flex; }
-        .preview-box { position: relative; width: 80px; height: 80px; border-radius: 8px; border: 1px solid var(--primary); overflow: hidden; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
-        .preview-remove { position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
-        #output-area, #video-output-area { height: 450px; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.7; background: rgba(0, 0, 0, 0.7); }
-        #video-output-area { height: 350px; display: flex; align-items: center; justify-content: center; }
+        #output-area, #video-output-area { height: 420px; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.7; background: rgba(0, 0, 0, 0.7); }
         .msg-user { color: #f59e0b; font-weight: bold; margin-top: 15px; margin-bottom: 10px; border-left: 3px solid #f59e0b; padding-left: 10px; }
-        .msg-user img { max-width: 200px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); display: block; margin-top: 10px; }
         .msg-ai { color: #ffffff; text-shadow: 0 0 8px rgba(0, 240, 255, 0.4); background: rgba(15, 23, 42, 0.7); padding: 16px; border-radius: 8px; border-left: 3px solid var(--primary); margin-bottom: 20px; white-space: pre-wrap; }
         .msg-error { color: #ef4444; font-weight: bold; margin-bottom: 20px; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; }
         .btn-run { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 2px; transition: 0.3s; }
@@ -91,27 +90,14 @@
         .log-panel-header { padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; color: var(--primary); font-size: 13px; font-weight: bold; }
         .log-panel-content { flex: 1; overflow-y: auto; padding: 15px; font-family: monospace; font-size: 12px; color: #10b981; line-height: 1.5; }
         .log-entry { margin-bottom: 6px; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 4px; } .log-entry.error { color: var(--danger); } .log-entry.warn { color: #f59e0b; }
-        .box-container.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: 100vw; z-index: 9999; border-radius: 0; margin: 0; } .box-container.fullscreen #output-area { height: calc(100vh - 45px); font-size: 18px; }
+        .box-container.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: 100vw; z-index: 9999; border-radius: 0; margin: 0; } .box-container.fullscreen textarea { height: calc(100vh - 120px); font-size: 18px; }
         
-        /* Gems 弹窗 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
-        .modal-overlay.show { display: flex; }
-        .modal-box { background: rgba(5, 9, 20, 0.98); border: 1px solid var(--secondary); border-radius: 12px; width: 500px; max-width: 90%; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 16px; font-weight: bold; border-bottom: 1px solid rgba(112,0,255,0.3); padding-bottom: 10px; }
-        .modal-close { background: transparent; border: none; color: #64748b; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .modal-close:hover { color: var(--danger); }
-        .modal-body { display: flex; flex-direction: column; gap: 12px; }
-        .modal-body label { font-size: 12px; color: #94a3b8; }
-        .modal-body input, .modal-body textarea { background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 12px; color: #fff; font-family: inherit; font-size: 14px; outline: none; transition: 0.3s; }
-        .modal-body textarea { height: 150px; resize: none; line-height: 1.5; }
-        .btn-save-gem { padding: 12px; background: linear-gradient(90deg, #4f46e5, var(--secondary)); border: none; border-radius: 8px; color: #fff; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        
-        /* 悬浮上传与智能 @ 菜单区 */
+        /* 悬浮资产栏样式 */
         .fancy-upload-bar { display: flex; align-items: center; gap: 10px; padding: 8px 15px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); }
         .btn-fancy-upload { display: flex; align-items: center; gap: 6px; background: rgba(112,0,255,0.15); border: 1px dashed var(--secondary); padding: 6px 12px; border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; transition: 0.2s; }
         .btn-fancy-upload:hover { background: rgba(112,0,255,0.3); border-color: var(--primary); text-shadow: 0 0 5px var(--primary); }
         
-        .asset-pills-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: rgba(0,0,0,0.1); min-height: 40px; }
+        .asset-pills-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 15px; background: rgba(0,0,0,0.1); min-height: 40px; }
         .asset-pill { display: flex; align-items: center; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(112,0,255,0.4); border-radius: 20px; padding: 3px 4px 3px 8px; font-size: 12px; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); transition: 0.2s; }
         .asset-pill:hover { border-color: var(--secondary); box-shadow: 0 2px 12px rgba(112,0,255,0.3); }
         .asset-pill-icon { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; overflow: hidden; margin-right: 6px; background: #000; border: 1px solid rgba(255,255,255,0.1); }
@@ -123,28 +109,65 @@
         .asset-pill-btn-del { background: transparent; border: none; color: #ef4444; font-size: 14px; margin-left: 6px; cursor: pointer; padding: 0 4px; opacity: 0.7; }
         .asset-pill-btn-del:hover { opacity: 1; }
 
-        /* The Magic Mention Menu */
-        .mention-menu {
-            display: none;
-            position: absolute;
-            background: rgba(15, 23, 42, 0.98);
-            border: 1px solid var(--secondary);
-            border-radius: 8px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.9);
-            z-index: 100;
-            max-height: 200px;
-            overflow-y: auto;
-            width: 250px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+        /* @ 补全联想菜单 */
+        .mention-menu { display: none; position: absolute; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--secondary); border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.9); z-index: 100; max-height: 180px; overflow-y: auto; width: 250px; top: 30px; left: 15px; }
         .mention-menu.show { display: block; }
-        .mention-item { padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; transition: 0.1s; }
+        .mention-item { padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; font-size: 12px; }
         .mention-item:hover, .mention-item.selected { background: rgba(112, 0, 255, 0.3); color: #fff; }
-        .mention-icon { width: 24px; height: 24px; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .mention-icon { width: 22px; height: 22px; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
         .mention-icon img { width: 100%; height: 100%; object-fit: cover; }
         .textarea-wrapper { position: relative; width: 100%; }
+
+        /* 多模态全量清单输出看板 */
+        .multimodal-manifest { display: flex; flex-direction: column; gap: 8px; padding: 12px 15px; background: rgba(0, 240, 255, 0.03); border-top: 1px dashed var(--border); font-size: 12px; }
+        .manifest-title { font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 5px; }
+        .manifest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 5px; }
+        .manifest-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; overflow: hidden; }
+        .manifest-card span { color: #94a3b8; font-weight: bold; }
+        .manifest-card p { color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+        .manifest-thumb { width: 20px; height: 20px; border-radius: 3px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* Modal 弹窗 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: rgba(5, 9, 20, 0.98); border: 1px solid var(--secondary); border-radius: 12px; width: 500px; max-width: 90%; padding: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 16px; font-weight: bold; border-bottom: 1px solid rgba(112,0,255,0.3); padding-bottom: 10px; }
+        .modal-close { background: transparent; border: none; color: #64748b; font-size: 20px; cursor: pointer; }
+
+        /* ========================================================== */
+        /* 📱 极客自适应核心：手机端与移动端排版重塑样式 (CORS Mobile) */
+        /* ========================================================== */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .app-container { flex-direction: column; gap: 15px; }
+            
+            /* 手机侧边栏重塑：变为顶部流式挂载区 */
+            .sidebar { width: 100%; height: auto; position: relative; top: 0; border-radius: 12px; padding: 15px; box-shadow: none; }
+            .btn-new-chat { margin-bottom: 12px; padding: 10px; font-size: 14px; }
+            .gems-list { max-height: 120px; gap: 6px; }
+            .session-list { max-height: 150px; gap: 6px; }
+            .session-item { padding: 10px; }
+
+            /* 手机配置卡槽排版重塑 */
+            .container { padding: 15px; border-radius: 12px; }
+            h1 { font-size: 1.2rem; margin-bottom: 15px; }
+            .input-row { flex-direction: column; gap: 12px; }
+            .config-group { margin-bottom: 10px; }
+            .config-group input, .config-group select { padding: 12px; font-size: 13px; }
+            
+            /* 手机大输入框高度调整，更利于手触 */
+            textarea { height: 100px; font-size: 14px; padding: 10px; }
+            #output-area, #video-output-area { height: 300px; padding: 12px; font-size: 13px; }
+            .btn-run { padding: 14px; font-size: 15px; border-radius: 8px; }
+            
+            /* 日志面板手机自适应宽屏 */
+            .log-panel { width: calc(100vw - 20px); right: 10px; left: 10px; bottom: 65px; height: 280px; }
+            .btn-log-toggle { padding: 10px 15px; font-size: 12px; bottom: 10px; right: 10px; }
+            
+            /* 手机胶囊池与清单响应式缩进 */
+            .manifest-grid { grid-template-columns: 1fr; gap: 6px; }
+            .fancy-upload-bar { padding: 8px 10px; flex-wrap: wrap; }
+        }
     </style>
 </head>
 <body>
@@ -157,7 +180,7 @@
                 <button class="btn-add-gem" onclick="openGemsModal()" title="新建固定提示词">⊕</button>
             </div>
             <div class="gems-list" id="gems-list"></div>
-            <div class="divider" style="margin: 5px 0 15px 0;"></div>
+            <div class="divider" style="margin: 5px 0 10px 0;"></div>
             <div class="session-list" id="session-list"></div>
         </div>
         
@@ -200,17 +223,28 @@
                     <div class="box-header">
                         <span class="box-title query-title">INPUT_QUERY (输入筛选指令)</span>
                         <div class="controls">
-                            <input type="file" id="mediaUpload" accept="image/*, video/*" style="display: none;" onchange="handleMediaSelect(event)">
-                            <button class="control-btn" onclick="document.getElementById('mediaUpload').click()" title="上传图片/视频">📎</button>
                             <button class="control-btn" onclick="toggleFullscreen('queryContainer')" title="全屏">⛶</button>
-                            <button class="control-btn" onclick="clearBox('queryArea')" title="清空">✕</button>
+                            <button class="control-btn" onclick="clearBox('queryArea', 'quant');" title="清空">✕</button>
                         </div>
                     </div>
-                    <textarea id="queryArea" placeholder="输入量化条件进行全量大模型智能推演..."></textarea>
-                    <div class="media-preview-container" id="mediaPreviewContainer">
-                        <div class="preview-box">
-                            <img id="previewImg" src=""><button class="preview-remove" onclick="removeMedia()">✕</button>
+                    
+                    <div class="fancy-upload-bar">
+                        <input type="file" id="quantMediaUpload" accept="image/*, video/*" multiple style="display: none;" onchange="handleAssetSelect(event, 'quant')">
+                        <div class="btn-fancy-upload" onclick="document.getElementById('quantMediaUpload').click()" title="支持批量载入报表、截图、多张图表进行比对分析">
+                            <span style="font-size:14px;">📎</span> 批量载入多模态数据源
                         </div>
+                        <div style="font-size:11px; color:#94a3b8; margin-left:5px;" class="desktop-only">💡 提示: 载入后文本中打 <b style="color:var(--primary)">@</b> 即可触发联想补全绑定！</div>
+                    </div>
+                    <div class="asset-pills-pool" id="quant-assets-pool"></div>
+
+                    <div class="textarea-wrapper">
+                        <textarea id="queryArea" oninput="syncQuantManifest()" placeholder="输入量化指令... 打个 @ 可融合上方载入的图片/报表进行联邦多模态推演..."></textarea>
+                        <div id="quantMentionMenu" class="mention-menu"></div>
+                    </div>
+
+                    <div class="multimodal-manifest">
+                        <div class="manifest-title">⚡ SCANNER CONTEXT (当前量化策略联邦全量输入清单)</div>
+                        <div class="manifest-grid" id="quant-manifest-grid"></div>
                     </div>
                 </div>
                 <button class="btn-run" onclick="executeCommand()">执行扫描策略 / RUN SCANNER</button>
@@ -243,33 +277,30 @@
                     <div class="input-row" style="margin-top:5px;">
                         <div class="config-group" style="flex: 1;">
                             <label>✦ 画面比例 (Aspect Ratio)</label>
-                            <select id="video-aspect-ratio" onchange="saveConfigToLocal()">
+                            <select id="video-aspect-ratio" onchange="syncVideoManifest()">
                                 <option value="16:9">16:9 宽屏 (默认)</option>
                                 <option value="9:16">9:16 竖屏 (短视频)</option>
                                 <option value="1:1">1:1 正方形</option>
                                 <option value="4:3">4:3 传统</option>
-                                <option value="3:4">3:4 纵向</option>
-                                <option value="2:1">2:1 横幅</option>
                                 <option value="auto">auto 智能自适应</option>
                             </select>
                         </div>
                         <div class="config-group" style="flex: 1;">
                             <label>✦ 视频时长 (Duration)</label>
-                            <select id="video-duration" onchange="saveConfigToLocal()">
-                                <option value="6">6 秒输出 (快刷)</option>
-                                <option value="10">10 秒输出 (长分镜)</option>
-                                <option value="5">5 秒输出 (标准)</option>
-                                <option value="15">15 秒输出 (极限满配)</option>
+                            <select id="video-duration" onchange="syncVideoManifest()">
+                                <option value="6">6 秒输出</option>
+                                <option value="10">10 秒输出</option>
+                                <option value="5">5 秒输出</option>
                             </select>
                         </div>
                         <div class="config-group" style="flex: 1;">
-                            <label>✦ 分辨率/尺寸等级 (Resolution)</label>
-                            <select id="video-quality" onchange="saveConfigToLocal()">
+                            <label>✦ 分辨率/画质 (Resolution)</label>
+                            <select id="video-quality" onchange="syncVideoManifest()">
                                 <option value="720p">720p HD 高清</option>
                                 <option value="480p">480p SD 标清</option>
                                 <option value="1080p">1080p FHD 全高清</option>
-                                <option value="1k">1K 级 (图模专用)</option>
-                                <option value="2k">2K 级 (图模顶配)</option>
+                                <option value="1k">1K 级</option>
+                                <option value="2k">2K 级</option>
                             </select>
                         </div>
                     </div>
@@ -279,30 +310,33 @@
                     <div class="box-header">
                         <span class="box-title" style="color:var(--secondary);">VIDEO_PROMPT (多模态分镜流与剧本)</span>
                         <div class="controls">
-                            <button class="control-btn" onclick="clearBox('videoQueryArea')" title="清空">✕</button>
+                            <button class="control-btn" onclick="clearBox('videoQueryArea', 'video');" title="清空">✕</button>
                         </div>
                     </div>
                     
                     <div class="fancy-upload-bar">
-                        <input type="file" id="videoMediaUpload" accept="image/*, video/*, audio/*" multiple style="display: none;" onchange="handleVideoAssetSelect(event)">
-                        <div class="btn-fancy-upload" onclick="document.getElementById('videoMediaUpload').click()" title="支持多选图片、视频抽帧、音频">
-                            <span style="font-size:16px;">📎</span> 批量载入资产池
+                        <input type="file" id="videoMediaUpload" accept="image/*, video/*, audio/*" multiple style="display: none;" onchange="handleAssetSelect(event, 'video')">
+                        <div class="btn-fancy-upload" onclick="document.getElementById('videoMediaUpload').click()" title="支持多选图片、音轨等进行联邦输出">
+                            <span style="font-size:14px;">📎</span> 批量载入创作资产池
                         </div>
-                        <div style="font-size:11px; color:#94a3b8; margin-left:5px;">💡 Tip: 载入后直接在下方剧本里打 <b style="color:var(--secondary)">@</b> 即可召唤补全菜单！</div>
+                        <div style="font-size:11px; color:#94a3b8; margin-left:5px;" class="desktop-only">💡 提示: 载入后直接在下方剧本里打 <b style="color:var(--secondary)">@</b> 即可召唤并关联资产！</div>
                     </div>
-                    
                     <div class="asset-pills-pool" id="video-assets-pool"></div>
 
                     <div class="textarea-wrapper">
-                        <textarea id="videoQueryArea" placeholder="用文字描写你的场景。如果想要引用上方导入的垫图，直接打个 @ 即可自动补全！"></textarea>
-                        
-                        <div id="mentionMenu" class="mention-menu"></div>
+                        <textarea id="videoQueryArea" oninput="syncVideoManifest()" placeholder="用文字描写分镜剧本。打个 @ 即可自动联想绑定导入的素材实体..."></textarea>
+                        <div id="videoMentionMenu" class="mention-menu"></div>
+                    </div>
+
+                    <div class="multimodal-manifest">
+                        <div class="manifest-title">⚡ CREATION CONTEXT (当前创作矩阵多模态联邦全量输出清单)</div>
+                        <div class="manifest-grid" id="video-manifest-grid"></div>
                     </div>
                 </div>
                 <button class="btn-run" style="background: linear-gradient(90deg, var(--primary), var(--secondary));" onclick="executeVideoGeneration()">渲染并生成媒体 / GENERATE</button>
                 <div class="box-container">
                     <div class="box-header"><span class="box-title" style="color:var(--secondary);">CREATION_OUTPUT (渲染播放区)</span></div>
-                    <div id="video-output-area"><div class="msg-sys">渲染引擎就绪。生成成功的媒体实体将在此处挂载独立原生播放器或查看器。</div></div>
+                    <div id="video-output-area"><div class="msg-sys">渲染引擎就绪。生成成功的媒体实体将在此处挂载原生播放器。</div></div>
                 </div>
             </div>
         </div>
@@ -326,15 +360,16 @@
     </div>
 
     <script>
-        const outputArea = document.getElementById('output-area');
-        const sessionListEl = document.getElementById('session-list');
-        const logContent = document.getElementById('logContent');
-        const logPanel = document.getElementById('logPanel');
-        
         let sessions = JSON.parse(localStorage.getItem('geek_sessions')) || {};
         let gems = JSON.parse(localStorage.getItem('geek_gems')) || [];
-        let currentSessionId = null; let chatHistory = []; let currentMediaBase64 = null; 
-        let videoAssets = []; 
+        let currentSessionId = null; let chatHistory = [];
+        
+        // 联邦多模态核心资产结构（按工作区分类）
+        let assetsMap = { quant: [], video: [] };
+        let mentionStates = {
+            quant: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'queryArea', menuId: 'quantMentionMenu' },
+            video: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'videoQueryArea', menuId: 'videoMentionMenu' }
+        };
 
         window.onload = () => {
             document.getElementById('api-main-url').value = localStorage.getItem('geek_api_url') || '';
@@ -346,7 +381,14 @@
             if(localStorage.getItem('geek_video_aspect')) document.getElementById('video-aspect-ratio').value = localStorage.getItem('geek_video_aspect');
             if(localStorage.getItem('geek_video_duration')) document.getElementById('video-duration').value = localStorage.getItem('geek_video_duration');
             if(localStorage.getItem('geek_video_resolution')) document.getElementById('video-quality').value = localStorage.getItem('geek_video_resolution');
-            renderSidebar(); renderGems(); renderVideoAssetsPool();
+            
+            renderSidebar(); renderGems(); 
+            renderAssetsPool('quant'); renderAssetsPool('video');
+            syncQuantManifest(); syncVideoManifest();
+
+            // 初始化联想菜单监听
+            initMentionSystem('quant'); initMentionSystem('video');
+
             const sessionIds = Object.keys(sessions);
             if (sessionIds.length > 0) { loadSession(sessionIds[sessionIds.length - 1]); } else { createNewSession(); }
         };
@@ -378,10 +420,10 @@
             logContent.appendChild(entry); logContent.scrollTop = logContent.scrollHeight;
         }
 
-        /* ================= 核心：极简 UI 胶囊化多模态资产 ================= */
-        async function handleVideoAssetSelect(e) {
+        /* ================= 全量多模态批量引入核心处理流 ================= */
+        async function handleAssetSelect(e, scope) {
             const files = e.target.files; if (!files || files.length === 0) return;
-            appendSysLog(`正在导入 ${files.length} 个多模态资产...`);
+            appendSysLog(`[${scope}] 正在导入 ${files.length} 个多模态联邦资产...`);
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]; const fileType = file.type.split('/')[0];
@@ -391,10 +433,10 @@
                         let base64Data = ev.target.result; let previewSrc = base64Data;
                         if (fileType === 'video') { try { previewSrc = await extractVideoFrame(file); } catch(err) { previewSrc = ''; } }
                         
-                        const typeCount = videoAssets.filter(a => a.type === fileType).length + 1;
+                        const typeCount = assetsMap[scope].filter(a => a.type === fileType).length + 1;
                         const generatedAlias = `${fileType}_${typeCount}`;
 
-                        videoAssets.push({
+                        assetsMap[scope].push({
                             id: 'asset_' + Date.now() + '_' + i,
                             fileName: file.name,
                             type: fileType,
@@ -407,139 +449,138 @@
                     reader.readAsDataURL(file);
                 });
             }
-            renderVideoAssetsPool(); e.target.value = ''; 
+            renderAssetsPool(scope);
+            if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
+            e.target.value = ''; 
         }
 
-        function renderVideoAssetsPool() {
-            const pool = document.getElementById('video-assets-pool'); pool.innerHTML = '';
-            if (videoAssets.length === 0) {
-                pool.innerHTML = `<span style="font-size:12px; color:#64748b; font-style:italic;">暂无资产。请点击上方按钮批量导入...</span>`; return;
+        function renderAssetsPool(scope) {
+            const pool = document.getElementById(`${scope}-assets-pool`); pool.innerHTML = '';
+            if (assetsMap[scope].length === 0) {
+                pool.innerHTML = `<span style="font-size:12px; color:#64748b; font-style:italic;">暂无引入资产。点击上方按钮批量载入...</span>`; return;
             }
-            videoAssets.forEach((asset, index) => {
+            assetsMap[scope].forEach((asset, index) => {
                 const pill = document.createElement('div'); pill.className = 'asset-pill';
                 let icon = (asset.type === 'image' || asset.type === 'video') ? `<img src="${asset.preview || asset.base64}">` : `<span style="font-size:12px;">🎵</span>`;
                 pill.innerHTML = `
                     <div class="asset-pill-icon">${icon}</div>
                     <div class="asset-pill-name">
                         <span>@</span>
-                        <input type="text" value="${asset.handle}" title="原文件: ${asset.fileName}&#10;点击直接修改别名" oninput="updateAssetHandleName(${index}, this.value)">
+                        <input type="text" value="${asset.handle}" oninput="updateAssetHandleName('${scope}', ${index}, this.value)">
                     </div>
-                    <button class="asset-pill-btn-del" onclick="removeVideoAsset(${index})" title="移除资产">✕</button>
+                    <button class="asset-pill-btn-del" onclick="removeAsset('${scope}', ${index})">✕</button>
                 `;
                 pool.appendChild(pill);
             });
         }
 
-        function updateAssetHandleName(index, typedValue) {
-            const cleanHandle = typedValue.replace(/[^a-zA-Z0-9_]/g, '');
-            videoAssets[index].handle = cleanHandle;
-            if (mentionState.active) renderMentionMenu();
+        function updateAssetHandleName(scope, index, typedValue) {
+            assetsMap[scope][index].handle = typedValue.replace(/[^a-zA-Z0-9_]/g, '');
+            if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
         }
 
-        function insertHandleTextToScript(finalHandleName) {
-            const textarea = document.getElementById('videoQueryArea');
-            const cursorStart = textarea.selectionStart;
-            const injectedString = `@${finalHandleName} `;
-            textarea.value = textarea.value.substring(0, cursorStart) + injectedString + textarea.value.substring(textarea.selectionEnd);
-            textarea.focus(); textarea.selectionStart = textarea.selectionEnd = cursorStart + injectedString.length;
-        }
+        function removeAsset(scope, index) { assetsMap[scope].splice(index, 1); renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
 
-        function removeVideoAsset(index) { videoAssets.splice(index, 1); renderVideoAssetsPool(); }
+        /* ================= 智能 @ 联想双端事件绑定 ================= */
+        function initMentionSystem(scope) {
+            const state = mentionStates[scope];
+            const area = document.getElementById(state.areaId);
+            const menu = document.getElementById(state.menuId);
 
-        /* ================= 智能 @ 联想补全监听器 ================= */
-        const videoTextArea = document.getElementById('videoQueryArea');
-        const mentionMenu = document.getElementById('mentionMenu');
-        let mentionState = { active: false, query: '', startIndex: -1, selectedIndex: 0, filteredAssets: [] };
-
-        videoTextArea.addEventListener('input', function(e) {
-            const cursor = this.selectionStart;
-            const textToCursor = this.value.substring(0, cursor);
-            const match = textToCursor.match(/@([a-zA-Z0-9_]*)$/);
-            
-            if (match && videoAssets.length > 0) {
-                mentionState.active = true;
-                mentionState.query = match[1].toLowerCase();
-                mentionState.startIndex = match.index;
+            area.addEventListener('input', function() {
+                const cursor = this.selectionStart;
+                const textToCursor = this.value.substring(0, cursor);
+                const match = textToCursor.match(/@([a-zA-Z0-9_]*)$/);
                 
-                mentionState.filteredAssets = videoAssets.filter(a => 
-                    a.handle.toLowerCase().includes(mentionState.query) || 
-                    a.fileName.toLowerCase().includes(mentionState.query)
-                );
-                
-                if (mentionState.filteredAssets.length > 0) { renderMentionMenu(); } 
-                else { closeMentionMenu(); }
-            } else { closeMentionMenu(); }
-        });
-
-        videoTextArea.addEventListener('keydown', function(e) {
-            if (!mentionState.active || mentionState.filteredAssets.length === 0) return;
-            if (e.key === 'ArrowDown') { e.preventDefault(); mentionState.selectedIndex = (mentionState.selectedIndex + 1) % mentionState.filteredAssets.length; updateMentionSelection(); } 
-            else if (e.key === 'ArrowUp') { e.preventDefault(); mentionState.selectedIndex = (mentionState.selectedIndex - 1 + mentionState.filteredAssets.length) % mentionState.filteredAssets.length; updateMentionSelection(); } 
-            else if (e.key === 'Enter') { e.preventDefault(); insertMention(mentionState.filteredAssets[mentionState.selectedIndex].handle); } 
-            else if (e.key === 'Escape') { closeMentionMenu(); }
-        });
-
-        function renderMentionMenu() {
-            mentionMenu.innerHTML = '';
-            mentionState.filteredAssets.forEach((asset, index) => {
-                const item = document.createElement('div');
-                item.className = `mention-item ${index === mentionState.selectedIndex ? 'selected' : ''}`;
-                let icon = (asset.type === 'image' || asset.type === 'video') ? `<img src="${asset.preview || asset.base64}">` : `<div style="font-size:12px;">🎵</div>`;
-                item.innerHTML = `<div class="mention-icon">${icon}</div><div style="display:flex; flex-direction:column; min-width:0;"><span style="font-weight:bold; color:var(--primary); font-size:13px;">@${asset.handle}</span><span style="color:#64748b; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📄 ${asset.fileName}</span></div>`;
-                item.onmousedown = (e) => { e.preventDefault(); insertMention(asset.handle); };
-                mentionMenu.appendChild(item);
+                if (match && assetsMap[scope].length > 0) {
+                    state.active = true; state.query = match[1].toLowerCase(); state.startIndex = match.index;
+                    state.filtered = assetsMap[scope].filter(a => a.handle.toLowerCase().includes(state.query) || a.fileName.toLowerCase().includes(state.query));
+                    if (state.filtered.length > 0) { renderMentionMenu(scope); } else { closeMenu(); }
+                } else { closeMenu(); }
             });
-            mentionMenu.classList.add('show');
-        }
 
-        function updateMentionSelection() {
-            const items = mentionMenu.querySelectorAll('.mention-item');
-            items.forEach((item, idx) => {
-                item.classList.toggle('selected', idx === mentionState.selectedIndex);
-                if (idx === mentionState.selectedIndex) item.scrollIntoView({ block: 'nearest' });
+            area.addEventListener('keydown', function(e) {
+                if (!state.active || state.filtered.length === 0) return;
+                if (e.key === 'ArrowDown') { e.preventDefault(); state.selectedIndex = (state.selectedIndex + 1) % state.filtered.length; updateSelection(); } 
+                else if (e.key === 'ArrowUp') { e.preventDefault(); state.selectedIndex = (state.selectedIndex - 1 + state.filtered.length) % state.filtered.length; updateSelection(); } 
+                else if (e.key === 'Enter') { e.preventDefault(); injectMention(scope, state.filtered[state.selectedIndex].handle); } 
+                else if (e.key === 'Escape') { closeMenu(); }
             });
-        }
 
-        function insertMention(handleName) {
-            const text = videoTextArea.value;
-            const before = text.substring(0, mentionState.startIndex);
-            const after = text.substring(videoTextArea.selectionStart);
-            const injected = `@${handleName} `;
-            videoTextArea.value = before + injected + after;
-            const newCursorPos = before.length + injected.length;
-            videoTextArea.focus(); videoTextArea.selectionStart = videoTextArea.selectionEnd = newCursorPos;
-            closeMentionMenu(); appendSysLog(`联动资产映射成功: @${handleName}`);
-        }
-
-        function closeMentionMenu() { mentionState.active = false; mentionState.selectedIndex = 0; mentionMenu.classList.remove('show'); }
-
-        document.addEventListener('click', (e) => {
-            if (e.target !== videoTextArea && !mentionMenu.contains(e.target)) { closeMentionMenu(); }
-        });
-
-        /* ================= 辅助函数与 UI 逻辑 ================= */
-        function handleMediaSelect(e) {
-            const file = e.target.files[0]; if (!file) return;
-            if (file.type.startsWith('image/')) {
-                const r = new FileReader(); r.onload = (ev) => { currentMediaBase64 = ev.target.result; document.getElementById('previewImg').src = currentMediaBase64; document.getElementById('mediaPreviewContainer').classList.add('show'); }; r.readAsDataURL(file);
-            } else if (file.type.startsWith('video/')) {
-                extractVideoFrame(file).then(base64 => { currentMediaBase64 = base64; document.getElementById('previewImg').src = base64; document.getElementById('mediaPreviewContainer').classList.add('show'); });
+            function renderMentionMenu(scope) {
+                menu.innerHTML = '';
+                state.filtered.forEach((asset, index) => {
+                    const item = document.createElement('div'); item.className = `mention-item ${index === state.selectedIndex ? 'selected' : ''}`;
+                    let icon = (asset.type === 'image' || asset.type === 'video') ? `<img src="${asset.preview || asset.base64}">` : `🎵`;
+                    item.innerHTML = `<div class="mention-icon">${icon}</div><div style="min-width:0;flex:1;"><b style="color:var(--primary)">@${asset.handle}</b><br><small style="color:#64748b;font-size:10px;">${asset.fileName}</small></div>`;
+                    item.onmousedown = (ev) => { ev.preventDefault(); injectMention(scope, asset.handle); };
+                    menu.appendChild(item);
+                });
+                menu.classList.add('show');
             }
+            function updateSelection() {
+                const items = menu.querySelectorAll('.mention-item');
+                items.forEach((item, idx) => { item.classList.toggle('selected', idx === state.selectedIndex); });
+            }
+            function closeMenu() { state.active = false; state.selectedIndex = 0; menu.classList.remove('show'); }
         }
-        function removeMedia() { currentMediaBase64 = null; document.getElementById('mediaPreviewContainer').classList.remove('show'); }
+
+        function injectMention(scope, handleName) {
+            const state = mentionStates[scope]; const area = document.getElementById(state.areaId);
+            const text = area.value; const before = text.substring(0, state.startIndex); const after = text.substring(area.selectionStart);
+            const injected = `@${handleName} `; area.value = before + injected + after;
+            area.focus(); area.selectionStart = area.selectionEnd = before.length + injected.length;
+            mentionStates[scope].active = false; document.getElementById(state.menuId).classList.remove('show');
+            if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
+        }
+
+        /* 实时全量看板联邦刷入 */
+        function syncQuantManifest() {
+            saveConfigToLocal(); const query = document.getElementById('queryArea').value.trim();
+            const grid = document.getElementById('quant-manifest-grid'); grid.innerHTML = `<div class="manifest-card"><span>📝 规约指令:</span><p>${query || '(空白策略)'}</p></div>`;
+            assetsMap.quant.forEach(asset => {
+                if (query.includes(`@${asset.handle}`)) {
+                    let thumb = (asset.type === 'image' || asset.type === 'video') ? `<img class="manifest-thumb" src="${asset.preview || asset.base64}">` : '';
+                    const card = document.createElement('div'); card.className = 'manifest-card';
+                    card.innerHTML = `${thumb}<span>📊 数据载荷:</span><p>@${asset.handle}</p>`;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
+        function syncVideoManifest() {
+            saveConfigToLocal(); const prompt = document.getElementById('videoQueryArea').value.trim();
+            const grid = document.getElementById('video-manifest-grid');
+            grid.innerHTML = `
+                <div class="manifest-card"><span>📝 文字剧本:</span><p>${prompt || '(未填写)'}</p></div>
+                <div class="manifest-card"><span>📐 比例:</span><p>${document.getElementById('video-aspect-ratio').value}</p></div>
+                <div class="manifest-card"><span>⏱ 时长:</span><p>${document.getElementById('video-duration').value}秒</p></div>
+                <div class="manifest-card"><span>💎 分辨率:</span><p>${document.getElementById('video-quality').value}</p></div>
+            `;
+            assetsMap.video.forEach(asset => {
+                if (prompt.includes(`@${asset.handle}`)) {
+                    let thumb = (asset.type === 'image' || asset.type === 'video') ? `<img class="manifest-thumb" src="${asset.preview || asset.base64}">` : '';
+                    const card = document.createElement('div'); card.className = 'manifest-card';
+                    card.innerHTML = `${thumb}<span>🎨 联邦素材:</span><p>@${asset.handle}</p>`;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
         function extractVideoFrame(file) {
             return new Promise((resolve) => {
                 const video = document.createElement('video'); video.autoplay = true; video.muted = true; video.playsInline = true; video.src = URL.createObjectURL(file);
-                video.onloadeddata = () => video.currentTime = 0.5;
-                video.onseeked = () => { const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0, c.width, c.height); resolve(c.to下URL('image/jpeg', 0.8)); };
+                video.onloadeddata = () => video.currentTime = 0.3;
+                video.onseeked = () => { const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0, c.width, c.height); resolve(c.toDataURL('image/jpeg', 0.8)); };
             });
         }
 
+        /* Gems */
         function openGemsModal() { document.getElementById('gemModal').classList.add('show'); }
-        function closeGemModal() { document.getElementById('gemModal').classList.remove('show'); }
+        function closeGemsModal() { document.getElementById('gemModal').classList.remove('show'); }
         function saveGem() {
             const name = document.getElementById('gemTitle').value.trim(); const prompt = document.getElementById('gemContent').value.trim();
-            if(!name || !prompt) return; gems.push({ name, prompt }); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); closeGemModal();
+            if(!name || !prompt) return; gems.push({ name, prompt }); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); closeGemsModal();
         }
         function renderGems() {
             const box = document.getElementById('gems-list'); box.innerHTML = '';
@@ -551,12 +592,12 @@
         }
         function applyGem(i) { 
             const activeTabId = document.querySelector('.tab-content.active').id;
-            const targetAreaId = activeTabId === 'quant-workspace' ? 'queryArea' : 'videoQueryArea';
-            document.getElementById(targetAreaId).value = gems[i].prompt; 
-            appendSysLog(`载入预设 Gem: ${gems[i].name} 到 ${activeTabId}`); 
+            if (activeTabId === 'quant-workspace') { document.getElementById('queryArea').value = gems[i].prompt; syncQuantManifest(); } 
+            else { document.getElementById('videoQueryArea').value = gems[i].prompt; syncVideoManifest(); }
         }
         function deleteGem(e, i) { e.stopPropagation(); gems.splice(i, 1); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); }
 
+        /* Session 逻辑 */
         function renderSidebar() {
             sessionListEl.innerHTML = ''; const ids = Object.keys(sessions).reverse();
             ids.forEach(id => {
@@ -570,135 +611,119 @@
             currentSessionId = id; chatHistory = sessions[id].history || []; renderSidebar(); outputArea.innerHTML = '';
             chatHistory.forEach(m => {
                 let txt = typeof m.content === 'string' ? m.content : m.content.find(t=>t.type==='text')?.text || '';
-                if(txt.includes('用户动态条件：\n')) txt = txt.split('用户动态条件：\n')[1].split('\n\n【辅助节点获取的数据】')[0];
+                if(txt.includes('用户动态条件：\n')) txt = txt.split('用户动态条件：\n')[1].split('\n\n【辅助节点】')[0];
                 outputArea.innerHTML += `<div class="${m.role==='user'?'msg-user':'msg-ai'}">${m.role==='user'?'用户提问: ':'助手: '}${txt}</div>`;
             });
         }
         function deleteSession(e, id) { e.stopPropagation(); delete sessions[id]; saveToLocal(); createNewSession(); }
         function saveToLocal() { localStorage.setItem('geek_sessions', JSON.stringify(sessions)); }
-        
         function addNode() {
             const w = document.getElementById('dynamic-nodes-wrapper'); const g = document.createElement('div'); g.className = 'config-group dynamic-node';
             g.innerHTML = `<label class="dynamic-label">✦ 参考节点</label><div class="input-row"><input type="text" class="ref-api-input" placeholder="填入通用 API 或网址..."><button class="btn-delete" onclick="removeNode(this)">✕</button></div>`;
             w.appendChild(g);
         }
         function removeNode(b) { b.closest('.dynamic-node').remove(); }
-        function clearBox(id) { document.getElementById(id).value = ""; removeMedia(); }
+        function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
-        /* 量化扫描执行流 */
+        /* ================= 量化大模型终端：全量多模态输出核心实现 ================= */
         async function executeCommand() {
-            const query = document.getElementById('queryArea').value.trim();
+            let query = document.getElementById('queryArea').value.trim();
             const apiUrl = document.getElementById('api-main-url').value.trim();
             const apiModel = document.getElementById('api-main-model').value.trim();
             const apiKey = document.getElementById('api-main-key').value.trim();
             if (!query) return; saveConfigToLocal();
+            
             if (chatHistory.length === 0) sessions[currentSessionId].title = query.substring(0, 12);
             outputArea.innerHTML += `<div class="msg-user">用户提问: ${query}</div>`;
-            const runTimestamp = new Date().toISOString(); const cacheBuster = `_t=${Date.now()}`;
+            appendSysLog(`正在编译全量多模态联邦载荷发送给分析大脑...`);
+
             try {
+                // 捕获量化框里被 @ 引用的所有图表资产
+                let boundImages = [];
+                assetsMap.quant.forEach(asset => {
+                    const tag = `@${asset.handle}`;
+                    if (query.includes(tag)) {
+                        if (asset.type === 'image' || asset.type === 'video') {
+                            boundImages.push(asset.base64);
+                            query = query.replace(tag, `[联邦参考载荷: @${asset.handle}]`); // 替换原有标签，保留逻辑位置
+                        }
+                    }
+                });
+
                 let combinedRawData = ""; const allNodes = document.querySelectorAll('.ref-api-input'); let dataSourceMeta = "全量数据源";
                 for (let i = 0; i < allNodes.length; i++) {
                     const nodeValue = allNodes[i].value.trim();
                     if (nodeValue && (nodeValue.startsWith('http://') || nodeValue.startsWith('https://'))) {
                         dataSourceMeta = nodeValue.split('?')[0];
-                        const res = await fetch(`${nodeValue}${nodeValue.includes('?')?'&':'?'}${cacheBuster}`, { cache: 'no-store' });
-                        if (res.ok) { const txt = await res.text(); combinedRawData += `【节点 ${i + 1}数据】:\n${txt.substring(0, 30000)}\n\n`; }
+                        const res = await fetch(`${nodeValue}${nodeValue.includes('?')?'&':'?'}_t=${Date.now()}`, { cache: 'no-store' });
+                        if (res.ok) { const txt = await res.text(); combinedRawData += `【节点 ${i + 1}数据】:\n${txt.substring(0, 20000)}\n\n`; }
                     }
                 }
-                const finalPrompt = `【Quant Scanner 指令】：用户动态条件：\n${query}\n\n【辅助节点获取的数据】（Raw Data）：\n${combinedRawData}\n\n【输出要求】：数据时间: ${runTimestamp} UTC\n行情来源: ${dataSourceMeta}\n扫描股票数量: 全市场扫描\n请据此推演独立完成用户要求的量化清洗排序，且不要列出被排除 company。`;
-                let finalContent = currentMediaBase64 ? [{ type: "text", text: finalPrompt }, { type: "image_url", image_url: { url: currentMediaBase64 } }] : finalPrompt;
-                chatHistory.push({ role: "user", content: finalContent });
-                const response = await fetch(apiUrl, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: apiModel, messages: chatHistory }) });
+
+                const finalPrompt = `【Quant Scanner 指令】：用户动态条件：\n${query}\n\n【辅助节点获取的数据】（Raw Data）：\n${combinedRawData}\n\n【输出要求】：推演独立完成用户要求的量化清洗排序，且不要列出被排除 company。`;
+                
+                // 将文字剧本、拉取的数据和图片资产全部打包输出
+                let messageContent = [{ type: "text", text: finalPrompt }];
+                boundImages.forEach(imgData => {
+                    messageContent.push({ type: "image_url", image_url: { url: imgData } });
+                });
+
+                chatHistory.push({ role: "user", content: messageContent });
+                
+                const response = await fetch(apiUrl, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, 
+                    body: JSON.stringify({ model: apiModel, messages: chatHistory }) 
+                });
+                
                 const resultJSON = await response.json(); let aiAnswer = resultJSON.choices[0].message.content;
                 chatHistory.push({ role: "assistant", content: aiAnswer }); sessions[currentSessionId].history = chatHistory; saveToLocal(); renderSidebar();
                 outputArea.innerHTML += `<div class="msg-ai">${aiAnswer}</div>`;
             } catch (error) { outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; }
         }
 
-        function renderMedia(url, modelName) {
-            if (url.match(/\.(mp4|webm|mov)$/i) || modelName.toLowerCase().includes('video') || modelName.toLowerCase().includes('runway') || modelName.toLowerCase().includes('sora') || modelName.toLowerCase().includes('luma')) {
-                return `<video src="${url}" controls autoplay loop style="max-width:100%; max-height:280px; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 20px rgba(0,240,255,0.2);"></video>`;
-            } else {
-                return `<img src="${url}" style="max-width:100%; max-height:280px; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 20px rgba(0,240,255,0.2);">`;
-            }
-        }
-
-        /* ================= 视频创作核心自适应路由适配器 ================= */
+        /* ================= 视频创作中心：全量多模态输出核心实现 ================= */
         async function executeVideoGeneration() {
             let scriptPrompt = document.getElementById('videoQueryArea').value.trim();
             let videoUrl = document.getElementById('api-video-url').value.trim() || document.getElementById('api-main-url').value.trim();
             let videoModel = document.getElementById('api-video-model').value.trim() || document.getElementById('api-main-model').value.trim();
             let videoKey = document.getElementById('api-video-key').value.trim() || document.getElementById('api-main-key').value.trim();
             
-            // 获取控制卡槽新参数
             let aspectSetting = document.getElementById('video-aspect-ratio').value;
             let durationSetting = parseInt(document.getElementById('video-duration').value);
             let resolutionSetting = document.getElementById('video-quality').value;
 
-            if (!scriptPrompt && videoAssets.length === 0) { alert("视频剧本描述不能为空！"); return; }
-            if (!videoUrl || !videoModel || !videoKey) { alert("鉴权卡槽（Key）配置缺失！"); return; }
+            if (!scriptPrompt && assetsMap.video.length === 0) { alert("视频创作提示与资产不能为空！"); return; }
+            if (!videoUrl || !videoModel || !videoKey) { alert("鉴权配置卡槽（Key/Url）缺失！"); return; }
 
             const vOutput = document.getElementById('video-output-area');
-            vOutput.innerHTML = `<div class="msg-sys" style="color:var(--primary);">>> [多模态路由] 正在分析端点协议并打包联邦载荷...</div>`;
-            const runTimestamp = new Date().toISOString(); 
-            appendSysLog(`=== 媒体生成任务启动 ===`);
+            vOutput.innerHTML = `<div class="msg-sys" style="color:var(--primary);">>> [多模态联邦] 正在封装包含文案、图片、音轨的全量多模态载荷...</div>`;
+            appendSysLog(`=== 视频矩阵全量输出启动 ===`);
 
             try {
-                let primaryImageBase64 = null;
-                if (videoAssets.length > 0) {
-                    for (let asset of videoAssets) {
-                        const handleTag = `@${asset.handle}`;
-                        if (scriptPrompt.includes(handleTag) && (asset.type === 'image' || asset.type === 'video')) {
-                            primaryImageBase64 = asset.base64;
-                            scriptPrompt = scriptPrompt.replace(handleTag, "").trim(); 
-                            appendSysLog(`侦测到脚本引用了 [${handleTag}]，已装填为垫图。`);
-                            break; 
-                        }
+                let boundImages = []; let boundAudios = [];
+                assetsMap.video.forEach(asset => {
+                    const handleTag = `@${asset.handle}`;
+                    if (scriptPrompt.includes(handleTag)) {
+                        if (asset.type === 'image' || asset.type === 'video') { boundImages.push(asset.base64); } 
+                        else if (asset.type === 'audio') { boundAudios.push(asset.base64); }
                     }
-                    if (!primaryImageBase64) {
-                        const fallbackAsset = videoAssets.find(a => a.type === 'image' || a.type === 'video');
-                        if (fallbackAsset) primaryImageBase64 = fallbackAsset.base64;
-                    }
-                }
+                });
 
-                // 核心：根据 URL 自动适配底层 API 协议 (超级防弹版)
                 let payload = {};
-                
-                // 只要网址里带有 image, video 或 generation，就一律走 prompt 格式
                 if (videoUrl.toLowerCase().includes("image") || videoUrl.toLowerCase().includes("video") || videoUrl.toLowerCase().includes("generation")) {
-                    appendSysLog("路由匹配：标准图像/视频生成端点。");
-                    
-                    payload = {
-                        model: videoModel,
-                        prompt: scriptPrompt || "Generate media",
-                        aspect_ratio: aspectSetting,
-                        resolution: resolutionSetting
-                    };
-                    
-                    // 只有在调用真实的视频模型/视频端点时，才注入 duration 时长参数
-                    if (videoUrl.toLowerCase().includes("video") || videoModel.toLowerCase().includes("video")) {
-                        payload.duration = durationSetting;
-                        appendSysLog(`参数装填: 时长设置为 ${durationSetting} 秒。`);
-                    }
-
-                    if (primaryImageBase64) { payload.image_url = primaryImageBase64; }
-                    appendSysLog(`参数装填: 宽高比 [${aspectSetting}], 分辨率 [${resolutionSetting}]`);
-                } 
-                else {
-                    appendSysLog("路由匹配：通用对话/多模态端点 (Chat/Completions API)。");
+                    appendSysLog("路由匹配：专项图像/视频端点 API 协议。");
+                    payload = { model: videoModel, prompt: scriptPrompt, aspect_ratio: aspectSetting, resolution: resolutionSetting };
+                    if (boundImages.length > 0) payload.image_url = boundImages[0];
+                    if (boundAudios.length > 0) payload.audio_url = boundAudios[0];
+                    if (videoUrl.toLowerCase().includes("video") || videoModel.toLowerCase().includes("video")) payload.duration = durationSetting;
+                } else {
+                    appendSysLog("路由匹配：通用多模态消息协议。");
                     payload.model = videoModel;
-                    if (primaryImageBase64) {
-                        payload.messages = [{                   
-                            role: "user",
-                            content: [
-                                { type: "text", text: scriptPrompt || "Generate media" },
-                                { type: "image_url", image_url: { url: primaryImageBase64 } }
-                            ]
-                        }];
-                    } else {
-                        payload.messages = [{ role: "user", content: scriptPrompt }];
-                    }
+                    let mContent = [{ type: "text", text: `【比例】:${aspectSetting} 【时长】:${durationSetting}s 【画质】:${resolutionSetting}\n【剧本】:\n${scriptPrompt}` }];
+                    boundImages.forEach(img => mContent.push({ type: "image_url", image_url: { url: img } }));
+                    payload.messages = [{ role: "user", content: mContent }];
                 }
 
                 const response = await fetch(videoUrl, {
@@ -707,67 +732,36 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`网关抛出阻断异常 状态码: ${response.status} - ${errText.substring(0, 150)}`);
-                }
-                
+                if (!response.ok) { const errText = await response.text(); throw new Error(`网关异常 状态码: ${response.status} - ${errText.substring(0, 120)}`); }
                 const result = await response.json();
-                appendSysLog(`投递成功，解析网关回传结果...`);
-
-                let mediaUrlSrc = result.video_url || result.image_url || result.url || (result.video && result.video.url) || (result.data && result.data[0]?.url) || (result.urls && result.urls[0]) || "";
+                
+                let mediaUrlSrc = result.video_url || result.image_url || result.url || (result.video && result.video.url) || (result.data && result.data[0]?.url) || "";
                 if (!mediaUrlSrc && result.choices && result.choices[0]?.message?.content) {
-                    let content = result.choices[0].message.content;
-                    let urlMatch = content.match(/https?:\/\/[^\s"']+/);
-                    if (urlMatch) mediaUrlSrc = urlMatch[0];
+                    let content = result.choices[0].message.content; let urlMatch = content.match(/https?:\/\/[^\s"']+/); if (urlMatch) mediaUrlSrc = urlMatch[0];
                 }
-
                 let taskId = result.id || result.task_id || result.request_id || "";
 
                 if (mediaUrlSrc) {
-                    vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(mediaUrlSrc, videoModel)}<div style="font-size:11px; color:#10b981;">✔ 媒体渲染成功！时间戳: ${runTimestamp}</div></div>`;
+                    vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(mediaUrlSrc, videoModel)}<div style="font-size:11px; color:#10b981;">✔ 全量媒体渲染成功！</div></div>`;
                 } else if (taskId && !mediaUrlSrc) {
-                    vOutput.innerHTML = `<div style="width:100%; text-align:left; font-size:13px;"><div style="color:#f59e0b; margin-bottom:5px;">✔ 网关已受理！任务 ID: ${taskId}</div><div id="polling-status" style="color:#00f0ff; margin-top: 10px; font-weight:bold;">正在云端排队渲染，每 5 秒自动查询中... ⏳</div></div>`;
-                    
+                    vOutput.innerHTML = `<div style="width:100%; font-size:13px;"><div style="color:#f59e0b;">✔ 任务派发成功！ID: ${taskId}</div><div id="polling-status" style="color:#00f0ff; margin-top:10px; font-weight:bold;">正在云端异步渲染融合中... ⏳</div></div>`;
                     let pollCount = 0;
                     let checkInterval = setInterval(async () => {
-                        pollCount++;
-                        if (pollCount > 60) {
-                            clearInterval(checkInterval);
-                            document.getElementById('polling-status').innerText = "查询超时，请稍后再试或检查日志。";
-                            return;
-                        }
+                        pollCount++; if (pollCount > 60) { clearInterval(checkInterval); return; }
                         try {
                             let pollUrl = videoUrl.includes('/generations') ? videoUrl.replace('/generations', `/${taskId}`) : `${videoUrl}/${taskId}`;
-                            let checkRes = await fetch(pollUrl, {
-                                method: "GET",
-                                headers: { "Authorization": `Bearer ${videoKey}`, "Content-Type": "application/json" }
-                            });
-                            
+                            let checkRes = await fetch(pollUrl, { method: "GET", headers: { "Authorization": `Bearer ${videoKey}`, "Content-Type": "application/json" } });
                             if (checkRes.ok) {
                                 let checkData = await checkRes.json();
-                                let finalUrl = checkData.video_url || checkData.image_url || checkData.url || (checkData.video && checkData.video.url) || (checkData.data && checkData.data[0]?.url) || "";
-                                
-                                if (finalUrl) {
-                                    clearInterval(checkInterval);
-                                    vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(finalUrl, videoModel)}<div style="font-size:11px; color:#10b981;">✔ 异步渲染完成！</div></div>`;
-                                } else if (checkData.status === "failed") {
-                                    clearInterval(checkInterval);
-                                    document.getElementById('polling-status').innerHTML = `<span style="color:#ef4444;">❌ 渲染失败，请检查提示词是否合规。</span>`;
-                                } else {
-                                    document.getElementById('polling-status').innerText = `正在云端排队渲染，已自动查询 ${pollCount} 次... ⏳`;
-                                }
+                                let finalUrl = checkData.video_url || checkData.image_url || checkData.url || (checkData.video && checkData.video.url) || "";
+                                if (finalUrl) { clearInterval(checkInterval); vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(finalUrl, videoModel)}</div>`; }
                             }
                         } catch (e) {}
                     }, 5000);
-
                 } else {
-                    vOutput.innerHTML = `<div style="width:100%; text-align:left; font-size:13px;"><div style="color:#f59e0b; margin-bottom:5px;">✔ 返回状态报文如下：</div><pre style="background:#000; padding:10px; border-radius:6px; color:#10b981; max-height:200px; overflow:auto; white-space:pre-wrap;">${JSON.stringify(result, null, 2)}</pre></div>`;
+                    vOutput.innerHTML = `<pre style="background:#000; padding:10px; border-radius:6px; color:#10b981; max-height:200px; overflow:auto;">${JSON.stringify(result, null, 2)}</pre>`;
                 }
-            } catch (e) {
-                appendSysLog(`任务异常中止: ${e.message}`, 'error');
-                vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${e.message}</div>`;
-            }
+            } catch (e) { vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${e.message}</div>`; }
         }
     </script>
 </body>
