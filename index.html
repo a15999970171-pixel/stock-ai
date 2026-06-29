@@ -77,7 +77,10 @@
         
         #output-area, #video-output-area { height: 420px; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.7; background: rgba(0, 0, 0, 0.7); }
         .msg-user { color: #f59e0b; font-weight: bold; margin-top: 15px; margin-bottom: 10px; border-left: 3px solid #f59e0b; padding-left: 10px; }
-        .msg-ai { color: #ffffff; text-shadow: 0 0 8px rgba(0, 240, 255, 0.4); background: rgba(15, 23, 42, 0.7); padding: 16px; border-radius: 8px; border-left: 3px solid var(--primary); margin-bottom: 20px; white-space: pre-wrap; }
+        .msg-ai { color: #ffffff; text-shadow: 0 0 8px rgba(0, 240, 255, 0.4); background: rgba(15, 23, 42, 0.7); padding: 16px; border-radius: 8px; border-left: 3px solid var(--primary); margin-bottom: 20px; white-space: pre-wrap; word-break: break-all; }
+        /* 🚀 新增：让大模型生成的图片在分析报告里极客化显示 */
+        .msg-ai img { max-width: 100%; border-radius: 8px; margin-top: 12px; border: 1px solid var(--primary); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); display: block; }
+        
         .msg-error { color: #ef4444; font-weight: bold; margin-bottom: 20px; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; }
         .btn-run { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 2px; transition: 0.3s; }
         .btn-run:hover { filter: brightness(1.2); box-shadow: 0 0 20px var(--primary); }
@@ -447,7 +450,7 @@
     </div>
 
     <script>
-        // 🚀 核心修复：定义所有必备的全局 DOM 变量
+        // 🚀 确保核心 DOM 变量全局可用
         const outputArea = document.getElementById('output-area');
         const logContent = document.getElementById('logContent');
         const logPanel = document.getElementById('logPanel');
@@ -511,7 +514,7 @@
         function appendSysLog(text, type = 'info') {
             const entry = document.createElement('div'); entry.className = `log-entry ${type}`;
             entry.innerText = `[${new Date().toLocaleTimeString()}] > ${text}`;
-            logContent.appendChild(entry); logContent.scrollTop = logContent.scrollHeight;
+            if(logContent) { logContent.appendChild(entry); logContent.scrollTop = logContent.scrollHeight; }
         }
 
         function openImportModal() { document.getElementById('importModal').classList.add('show'); }
@@ -553,7 +556,7 @@
         }
 
         function exportReport() {
-            if (!outputArea.innerHTML.trim()) {
+            if (!outputArea || !outputArea.innerHTML.trim()) {
                 alert("当前没有可导出的分析报告内容！");
                 return;
             }
@@ -813,6 +816,8 @@
             syncQuantManifest(); 
             closeGemRunModal();
             appendSysLog(`已从策略沙盒触发全局投递...`); 
+            
+            // 🚀 修复调用主命令函数
             executeCommand();
         }
 
@@ -910,15 +915,16 @@
         function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
-        // 🚀 核心修复：执行扫面策略逻辑
+        // 🚀 核心修复：执行扫描策略的逻辑，解开了强制纯文本限制，并且直接在屏幕输出 Markdown 图片
         async function executeCommand() {
             let query = document.getElementById('queryArea').value.trim();
             const apiUrl = document.getElementById('api-main-url').value.trim();
             const apiModel = document.getElementById('api-main-model').value.trim();
             const apiKey = document.getElementById('api-main-key').value.trim();
-            if (!query) return; saveConfigToLocal();
+            if (!query) return; 
+            saveConfigToLocal();
             
-            // 🚀 安全防御机制：确保 currentSessionId 存在
+            // 确保会话有效
             if (!currentSessionId || !sessions[currentSessionId]) {
                 createNewSession();
             }
@@ -954,7 +960,8 @@
                     }
                 }
 
-                const finalPrompt = `【Quant Scanner 指令】：用户动态条件：\n${query}\n\n【辅助节点获取的数据】（Raw Data）：\n${combinedRawData}\n\n【输出要求】：推演独立完成用户要求的量化清洗排序，且不要列出被排除 company。`;
+                // 🚀 修复核心：解开了死板的限制。让大模型根据你的问题自由判断该回啥（比如遇到“给我画雪山”不再报错）
+                const finalPrompt = `【系统指令】：用户请求：\n${query}\n\n【附加数据源】：\n${combinedRawData}\n\n【任务要求】：请直接响应用户请求。如果是量化分析任务，请推演清洗排序；如果是画图或通用问答，请直接执行并返回结果。`;
                 
                 let messageContent = [{ type: "text", text: finalPrompt }];
                 boundImages.forEach(imgData => {
@@ -969,11 +976,17 @@
                     body: JSON.stringify({ model: apiModel, messages: chatHistory }) 
                 });
                 
-                const resultJSON = await response.json(); let aiAnswer = resultJSON.choices[0].message.content;
+                const resultJSON = await response.json(); 
+                let aiAnswer = resultJSON.choices[0].message.content;
+
+                // 🚀 核心修复2：如果大模型给你返回了 Markdown 格式的图片(比如：![雪山](http...))，这段代码能把它瞬间渲染出来！
+                aiAnswer = aiAnswer.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 15px rgba(0,240,255,0.2); margin: 10px 0;">');
+
                 chatHistory.push({ role: "assistant", content: aiAnswer }); 
                 sessions[currentSessionId].history = chatHistory; 
                 saveToLocal(); 
                 renderSidebar();
+                
                 if(outputArea) outputArea.innerHTML += `<div class="msg-ai">${aiAnswer}</div>`;
             } catch (error) { 
                 if(outputArea) outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; 
