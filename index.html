@@ -92,8 +92,8 @@
         .box-container.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: 100vw; z-index: 9999; border-radius: 0; margin: 0; } .box-container.fullscreen textarea { height: calc(100vh - 120px); font-size: 18px; }
         
         .fancy-upload-bar { display: flex; align-items: center; gap: 10px; padding: 8px 15px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); }
-        .btn-fancy-upload { display: flex; align-items: center; gap: 6px; background: rgba(112,0,255,0.15); border: 1px solid var(--secondary); padding: 6px 12px; border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .btn-fancy-upload:hover { background: var(--secondary); box-shadow: 0 0 25px rgba(112, 0, 255, 0.8); text-shadow: 0 0 5px #fff; }
+        .btn-fancy-upload { display: flex; align-items: center; gap: 6px; background: rgba(112,0,255,0.15); border: 1px dashed var(--secondary); padding: 6px 12px; border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-fancy-upload:hover { background: rgba(112,0,255,0.3); border-color: var(--primary); text-shadow: 0 0 5px var(--primary); }
         
         .asset-pills-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 15px; background: rgba(0,0,0,0.1); min-height: 40px; }
         .asset-pill { display: flex; align-items: center; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(112,0,255,0.4); border-radius: 20px; padding: 3px 4px 3px 8px; font-size: 12px; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); transition: 0.2s; }
@@ -134,6 +134,9 @@
 
         .btn-global-import { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 10px 18px; background: rgba(112, 0, 255, 0.15); border: 1px solid var(--secondary); border-radius: 8px; color: #fff; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(112, 0, 255, 0.3); display: flex; align-items: center; gap: 6px; }
         .btn-global-import:hover { background: var(--secondary); box-shadow: 0 0 25px rgba(112, 0, 255, 0.8); text-shadow: 0 0 5px #fff; }
+
+        /* 🚀 新增：手机端专属媒体导出按钮样式（平时隐藏，手机端显示） */
+        .btn-mobile-export { display: none; }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -184,8 +187,12 @@
             .mention-item { padding: 14px; font-size: 14px; }
             .mention-icon { width: 30px; height: 30px; }
 
-            #output-area, #video-output-area { height: 350px; padding: 15px; font-size: 13px; }
+            #output-area, #video-output-area { height: 350px; padding: 15px; font-size: 13px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
             
+            /* 🚀 新增：手机端专属媒体导出大按钮样式激活 */
+            .btn-mobile-export { display: block; width: 100%; padding: 14px; background: rgba(16, 185, 129, 0.15); border: none; border-top: 1px dashed rgba(16, 185, 129, 0.5); color: #10b981; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; transition: 0.3s; border-radius: 0 0 16px 16px; margin-top: 0; }
+            .btn-mobile-export:hover, .btn-mobile-export:active { background: #10b981; color: #000; }
+
             .btn-global-import { top: 10px; right: 10px; font-size: 12px; padding: 8px 12px; z-index: 1002; }
             .log-panel { width: calc(100vw - 20px); right: 10px; left: 10px; bottom: 65px; height: 350px; z-index: 1001; }
             .btn-log-toggle { padding: 12px 16px; font-size: 13px; bottom: 10px; right: 10px; }
@@ -381,6 +388,7 @@
                         </div>
                     </div>
                     <div id="video-output-area"><div class="msg-sys">渲染引擎就绪。生成成功的媒体实体将在此处挂载原生播放器。</div></div>
+                    <button class="btn-mobile-export" onclick="exportVideo()">⇘ 一键导出生成的媒体文件</button>
                 </div>
             </div>
         </div>
@@ -445,7 +453,6 @@
         let gems = JSON.parse(localStorage.getItem('geek_gems')) || [];
         let currentSessionId = null; let chatHistory = [];
         
-        // 🚀 新增：专门缓存当前生成的视频或图片媒体地址，供一键导出使用
         let currentGeneratedMediaUrl = null; 
 
         let assetsMap = { quant: [], video: [] };
@@ -504,7 +511,6 @@
             logContent.appendChild(entry); logContent.scrollTop = logContent.scrollHeight;
         }
 
-        /* API 批量导入核心解析逻辑 */
         function openImportModal() { document.getElementById('importModal').classList.add('show'); }
         function closeImportModal() { document.getElementById('importModal').classList.remove('show'); document.getElementById('importArea').value = ''; }
         
@@ -543,7 +549,6 @@
             appendSysLog(`✔ 批量导入成功！共解析并挂载了 ${lines.length} 条配置。`);
         }
 
-        /* 一键导出报告为 HTML */
         function exportReport() {
             const outputArea = document.getElementById('output-area');
             if (!outputArea.innerHTML.trim()) {
@@ -586,7 +591,6 @@
             appendSysLog('✔ 分析报告已成功打包！请在弹出的窗口中选择文件夹保存。');
         }
 
-        /* 🚀 新增：一键导出生成的视频与流媒体文件 */
         function exportVideo() {
             if (!currentGeneratedMediaUrl) {
                 alert("当前播放区没有检测到任何生成的视频或媒体资产！");
@@ -970,7 +974,6 @@
             }
         }
 
-        /* 视频创作中心：全量多模态输出与联动导出核心实现 */
         async function executeVideoGeneration() {
             let scriptPrompt = document.getElementById('videoQueryArea').value.trim();
             let videoUrl = document.getElementById('api-video-url').value.trim() || document.getElementById('api-main-url').value.trim();
