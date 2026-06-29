@@ -33,16 +33,18 @@
         .gem-item { background: rgba(112, 0, 255, 0.05); border: 1px solid rgba(112, 0, 255, 0.3); border-radius: 8px; padding: 12px; cursor: pointer; font-size: 13px; color: #cbd5e1; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; }
         .gem-item:hover { background: rgba(112, 0, 255, 0.2); border-color: var(--primary); color: #fff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); transform: translateX(2px); }
         
-        /* 手机专属的对话流表头，电脑端默认隐藏 */
         .mobile-session-header { display: none; }
         
         .session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
-        .session-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        
+        /* 策略层 (Session) 样式升级：变成 AI 文本框形态 */
+        .session-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; transition: 0.2s; }
         .session-item:hover { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
         .session-item.active { border-color: var(--primary); background: rgba(0, 240, 255, 0.1); border-left: 4px solid var(--primary); }
-        .session-title { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; color: #cbd5e1; }
-        .session-item.active .session-title { color: #fff; font-weight: bold; }
-        .btn-del-session { background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .session-preview-box { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 8px; margin-top: 6px; font-size: 12px; color: #94a3b8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; transition: 0.2s; }
+        .session-item.active .session-preview-box { border-color: rgba(0, 240, 255, 0.3); color: #fff; }
+        
+        .btn-del-session { background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center; align-self: center; }
         .btn-del-session:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
         
         /* 导航与框架 */
@@ -149,13 +151,12 @@
             body { padding: 10px; }
             .app-container { flex-direction: column; gap: 15px; }
             
-            /* 【核心修复】手机端专属侧边栏逆天改序！让对话流直接在新建按钮下方出现 */
+            /* 手机侧边栏重塑：变为顶部流式挂载区 */
             .sidebar { width: 100%; height: auto; position: relative; top: 0; border-radius: 12px; padding: 15px; box-shadow: none; z-index: 1; display: flex; flex-direction: column; }
             .btn-new-chat { order: 1; margin-bottom: 10px; padding: 14px; font-size: 15px; }
-            /* 手机专属标题显现 */
+            /* 手机专属标题显现，直接在新建按钮下方 */
             .mobile-session-header { order: 2; display: block; color: var(--secondary); font-size: 13px; font-weight: bold; margin-bottom: 8px; margin-top: 5px; }
-            /* 调整高度，保证绝不遮挡 */
-            .session-list { order: 3; max-height: 180px; gap: 8px; margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 15px; }
+            .session-list { order: 3; max-height: 200px; gap: 8px; margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 15px; }
             .gems-header { order: 4; margin-top: 5px; }
             .gems-list { order: 5; max-height: 180px; gap: 8px; }
             .divider { display: none; }
@@ -220,13 +221,13 @@
         <div class="sidebar">
             <button class="btn-new-chat" onclick="createNewSession()"><span>+</span> 新建策略对话</button>
             <div class="mobile-session-header">✦ 当前对话流 (点击切换/删除)</div>
+            <div class="session-list" id="session-list"></div>
+            <div class="divider" style="margin: 5px 0 10px 0;"></div>
             <div class="gems-header">
                 <span>✦ My Gems (策略预设)</span>
                 <button class="btn-add-gem" onclick="openGemsModal()" title="新建固定提示词">⊕</button>
             </div>
             <div class="gems-list" id="gems-list"></div>
-            <div class="divider" style="margin: 5px 0 10px 0;"></div>
-            <div class="session-list" id="session-list"></div>
         </div>
         
         <div class="main-content">
@@ -420,6 +421,7 @@
     </div>
 
     <script>
+        // 【核心】给 Session 对象增加 queryText 字段，用于保存每个图层的输入框内容
         let sessions = JSON.parse(localStorage.getItem('geek_sessions')) || {};
         let gems = JSON.parse(localStorage.getItem('geek_gems')) || [];
         let currentSessionId = null; let chatHistory = [];
@@ -442,15 +444,18 @@
             if(localStorage.getItem('geek_video_duration')) document.getElementById('video-duration').value = localStorage.getItem('geek_video_duration');
             if(localStorage.getItem('geek_video_resolution')) document.getElementById('video-quality').value = localStorage.getItem('geek_video_resolution');
             
-            renderSidebar(); renderGems(); 
+            renderGems(); 
             renderAssetsPool('quant'); renderAssetsPool('video');
-            syncQuantManifest(); syncVideoManifest();
-
+            
             // 初始化联想菜单监听
             initMentionSystem('quant'); initMentionSystem('video');
 
             const sessionIds = Object.keys(sessions);
-            if (sessionIds.length > 0) { loadSession(sessionIds[sessionIds.length - 1]); } else { createNewSession(); }
+            if (sessionIds.length > 0) { 
+                loadSession(sessionIds[sessionIds.length - 1]); 
+            } else { 
+                createNewSession(); 
+            }
         };
 
         function saveConfigToLocal() {
@@ -594,9 +599,18 @@
             if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
         }
 
-        /* 实时全量看板联邦刷入 (加入像素级图标对齐) */
+        /* 实时全量看板联邦刷入 + 自动绑定当前图层输入框 */
         function syncQuantManifest() {
-            saveConfigToLocal(); const query = document.getElementById('queryArea').value.trim();
+            saveConfigToLocal(); 
+            const query = document.getElementById('queryArea').value;
+            
+            // 【核心修复】将当前文本框里的字，实时保存在当前激活的 Session 图层里
+            if (currentSessionId && sessions[currentSessionId]) {
+                sessions[currentSessionId].queryText = query;
+                saveToLocal();
+                renderSidebar(); // 实时刷新左侧的文本预览气泡
+            }
+
             const grid = document.getElementById('quant-manifest-grid'); 
             grid.innerHTML = `<div class="manifest-card"><span><i class="manifest-icon">📝</i>规约指令:</span><p>${query || '(空白策略)'}</p></div>`;
             assetsMap.quant.forEach(asset => {
@@ -644,7 +658,6 @@
             if(!name || !prompt) return; gems.push({ name, prompt }); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); closeGemsModal();
         }
         
-        // 💎 升级 1：给 Gems 列表加上炫酷的钻石图标和更精美的排版
         function renderGems() {
             const box = document.getElementById('gems-list'); box.innerHTML = '';
             gems.forEach((g, i) => {
@@ -660,7 +673,6 @@
             });
         }
         
-        // 💎 升级 2：点击 Gem 不再直接粘贴，而是弹出独立的高级运行对话框
         function applyGem(i) { 
             const gemObj = gems[i];
             document.getElementById('runGemTitle').innerHTML = `<span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span> 策略预设：${gemObj.name}`;
@@ -673,24 +685,14 @@
             document.getElementById('gemRunModal').classList.remove('show');
         }
 
-        // 💎 升级 3：独立的 Gem 执行引擎，完美回传到分析报告
         function executeGemCommand() {
             const gemText = document.getElementById('gemRunArea').value.trim();
             if(!gemText) return;
-
-            // 1. 确保将界面强行切回到“量化扫描终端”，以保证结果输出位置正确
             switchWorkspace('quant-workspace', document.querySelector('.nav-tab'));
-            
-            // 2. 将修改后的 Gem 内容自动映射到主指令框
             document.getElementById('queryArea').value = gemText;
-            syncQuantManifest(); // 同步底下的看板清单
-
-            // 3. 关闭专属弹窗
+            syncQuantManifest(); 
             closeGemRunModal();
-
             appendSysLog(`已从策略沙盒触发全局投递...`); 
-            
-            // 4. 调用核心的主执行函数，自然输出到“分析报告”
             executeCommand();
         }
 
@@ -698,33 +700,105 @@
 
         /* ============================================================= */
 
-        /* Session 逻辑 */
+        /* 【升级】左侧文本框形态的多图层 (Session) 逻辑 */
         function renderSidebar() {
-            sessionListEl.innerHTML = ''; const ids = Object.keys(sessions).reverse();
+            const sessionListEl = document.getElementById('session-list');
+            sessionListEl.innerHTML = ''; 
+            const ids = Object.keys(sessions).reverse();
+            
             ids.forEach(id => {
-                const item = document.createElement('div'); item.className = `session-item ${id === currentSessionId ? 'active' : ''}`; item.onclick = () => loadSession(id);
-                item.innerHTML = `<div class="session-title">${sessions[id].title}</div><button class="btn-del-session" onclick="deleteSession(event, '${id}')">✕</button>`;
+                const isActive = (id === currentSessionId);
+                const item = document.createElement('div'); 
+                item.className = `session-item ${isActive ? 'active' : ''}`; 
+                item.onclick = () => loadSession(id);
+                
+                // 获取当前层保存的预览文字
+                let previewText = sessions[id].queryText || "";
+                
+                item.innerHTML = `
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+                        <div style="font-size:13px; font-weight:bold; color:${isActive ? '#fff' : '#cbd5e1'};">✦ ${sessions[id].title || '策略层'}</div>
+                        <div class="session-preview-box">${previewText || '（空白策略，点击输入...）'}</div>
+                    </div>
+                    <button class="btn-del-session" onclick="deleteSession(event, '${id}')">✕</button>
+                `;
                 sessionListEl.appendChild(item);
             });
         }
-        function createNewSession() { currentSessionId = 'session_' + Date.now(); chatHistory = []; sessions[currentSessionId] = { title: "新对话", history: [] }; saveToLocal(); renderSidebar(); outputArea.innerHTML = ''; }
+        
+        function createNewSession() { 
+            // 【核心修复】：防止疯狂点击新建导致空白图层无限堆叠
+            if (currentSessionId && sessions[currentSessionId]) {
+                const cur = sessions[currentSessionId];
+                // 如果当前层本身就没有任何历史对话，且文本框里啥也没打，那就直接清空焦点，不要再建新层了
+                if (cur.history.length === 0 && (!cur.queryText || cur.queryText.trim() === '')) {
+                    document.getElementById('queryArea').value = '';
+                    syncQuantManifest();
+                    outputArea.innerHTML = '';
+                    return;
+                }
+            }
+
+            currentSessionId = 'session_' + Date.now(); 
+            chatHistory = []; 
+            // 初始化新的图层，自带 queryText 属性
+            sessions[currentSessionId] = { title: "新策略层", history: [], queryText: "" }; 
+            
+            // 新建时，强行清空右侧的输入框，给用户一张白纸
+            document.getElementById('queryArea').value = '';
+            syncQuantManifest();
+            
+            saveToLocal(); 
+            renderSidebar(); 
+            outputArea.innerHTML = ''; 
+        }
+        
         function loadSession(id) {
-            currentSessionId = id; chatHistory = sessions[id].history || []; renderSidebar(); outputArea.innerHTML = '';
+            currentSessionId = id; 
+            chatHistory = sessions[id].history || []; 
+            
+            // 点击历史图层时，把该图层保存的内容强行恢复到输入框里
+            document.getElementById('queryArea').value = sessions[id].queryText || '';
+            syncQuantManifest();
+
+            renderSidebar(); 
+            outputArea.innerHTML = '';
+            
+            // 恢复历史回包内容
             chatHistory.forEach(m => {
                 let txt = typeof m.content === 'string' ? m.content : m.content.find(t=>t.type==='text')?.text || '';
                 if(txt.includes('用户动态条件：\n')) txt = txt.split('用户动态条件：\n')[1].split('\n\n【辅助节点】')[0];
                 outputArea.innerHTML += `<div class="${m.role==='user'?'msg-user':'msg-ai'}">${m.role==='user'?'用户提问: ':'助手: '}${txt}</div>`;
             });
         }
-        function deleteSession(e, id) { e.stopPropagation(); delete sessions[id]; saveToLocal(); createNewSession(); }
+        
+        function deleteSession(e, id) { 
+            e.stopPropagation(); 
+            delete sessions[id]; 
+            saveToLocal(); 
+            
+            // 如果删光了，自动新建一个
+            if (Object.keys(sessions).length === 0) {
+                createNewSession();
+            } else {
+                // 如果删的是当前激活的，自动跳到第一个
+                if (id === currentSessionId) {
+                    const remainingIds = Object.keys(sessions).reverse();
+                    loadSession(remainingIds[0]);
+                } else {
+                    renderSidebar();
+                }
+            }
+        }
         function saveToLocal() { localStorage.setItem('geek_sessions', JSON.stringify(sessions)); }
+        
         function addNode() {
             const w = document.getElementById('dynamic-nodes-wrapper'); const g = document.createElement('div'); g.className = 'config-group dynamic-node';
             g.innerHTML = `<label class="dynamic-label">✦ 参考节点</label><div class="input-row"><input type="text" class="ref-api-input" placeholder="填入通用 API 或网址..."><button class="btn-delete" onclick="removeNode(this)">✕</button></div>`;
             w.appendChild(g);
         }
         function removeNode(b) { b.closest('.dynamic-node').remove(); }
-        function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); }
+        function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
         /* 量化扫描执行流 (输出到分析报告) */
@@ -735,7 +809,13 @@
             const apiKey = document.getElementById('api-main-key').value.trim();
             if (!query) return; saveConfigToLocal();
             
-            if (chatHistory.length === 0) sessions[currentSessionId].title = query.substring(0, 12);
+            // 首次执行时，将左侧图层标题改为指令的前几个字
+            if (sessions[currentSessionId].title === "新策略层") {
+                sessions[currentSessionId].title = query.substring(0, 12) + '...';
+                saveToLocal();
+                renderSidebar();
+            }
+
             outputArea.innerHTML += `<div class="msg-user">用户提问: ${query}</div>`;
             appendSysLog(`正在编译全量多模态联邦载荷发送给分析大脑...`);
 
