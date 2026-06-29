@@ -447,6 +447,11 @@
     </div>
 
     <script>
+        // 🚀 核心修复：定义所有必备的全局 DOM 变量
+        const outputArea = document.getElementById('output-area');
+        const logContent = document.getElementById('logContent');
+        const logPanel = document.getElementById('logPanel');
+
         let sessions = JSON.parse(localStorage.getItem('geek_sessions')) || {};
         let gems = JSON.parse(localStorage.getItem('geek_gems')) || [];
         let currentSessionId = null; let chatHistory = [];
@@ -548,7 +553,6 @@
         }
 
         function exportReport() {
-            const outputArea = document.getElementById('output-area');
             if (!outputArea.innerHTML.trim()) {
                 alert("当前没有可导出的分析报告内容！");
                 return;
@@ -809,8 +813,6 @@
             syncQuantManifest(); 
             closeGemRunModal();
             appendSysLog(`已从策略沙盒触发全局投递...`); 
-            
-            // 🚀 修复调用主命令函数
             executeCommand();
         }
 
@@ -841,12 +843,13 @@
         }
         
         function createNewSession() { 
+            // 🚀 确保安全执行
             if (currentSessionId && sessions[currentSessionId]) {
                 const cur = sessions[currentSessionId];
-                if (cur.history.length === 0 && (!cur.queryText || cur.queryText.trim() === '')) {
+                if (cur.history && cur.history.length === 0 && (!cur.queryText || cur.queryText.trim() === '')) {
                     document.getElementById('queryArea').value = '';
                     syncQuantManifest();
-                    outputArea.innerHTML = '';
+                    if(outputArea) outputArea.innerHTML = '';
                     return;
                 }
             }
@@ -860,7 +863,7 @@
             
             saveToLocal(); 
             renderSidebar(); 
-            outputArea.innerHTML = ''; 
+            if(outputArea) outputArea.innerHTML = ''; 
         }
         
         loadSession = function(id) {
@@ -871,12 +874,12 @@
             syncQuantManifest();
 
             renderSidebar(); 
-            outputArea.innerHTML = '';
+            if(outputArea) outputArea.innerHTML = '';
             
             chatHistory.forEach(m => {
                 let txt = typeof m.content === 'string' ? m.content : m.content.find(t=>t.type==='text')?.text || '';
                 if(txt.includes('用户动态条件：\n')) txt = txt.split('用户动态条件：\n')[1].split('\n\n【辅助节点】')[0];
-                outputArea.innerHTML += `<div class="${m.role==='user'?'msg-user':'msg-ai'}">${m.role==='user'?'用户提问: ':'助手: '}${txt}</div>`;
+                if(outputArea) outputArea.innerHTML += `<div class="${m.role==='user'?'msg-user':'msg-ai'}">${m.role==='user'?'用户提问: ':'助手: '}${txt}</div>`;
             });
         }
         
@@ -907,22 +910,26 @@
         function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
-        // 🚀 修复核心执行函数的挂载定义
+        // 🚀 核心修复：执行扫面策略逻辑
         async function executeCommand() {
             let query = document.getElementById('queryArea').value.trim();
             const apiUrl = document.getElementById('api-main-url').value.trim();
             const apiModel = document.getElementById('api-main-model').value.trim();
             const apiKey = document.getElementById('api-main-key').value.trim();
-            if (!query) return; 
-            saveConfigToLocal();
+            if (!query) return; saveConfigToLocal();
             
+            // 🚀 安全防御机制：确保 currentSessionId 存在
+            if (!currentSessionId || !sessions[currentSessionId]) {
+                createNewSession();
+            }
+
             if (sessions[currentSessionId].title === "新策略层") {
                 sessions[currentSessionId].title = query.substring(0, 12) + '...';
                 saveToLocal();
                 renderSidebar();
             }
 
-            outputArea.innerHTML += `<div class="msg-user">用户提问: ${query}</div>`;
+            if(outputArea) outputArea.innerHTML += `<div class="msg-user">用户提问: ${query}</div>`;
             appendSysLog(`正在编译全量多模态联邦载荷发送给分析大脑...`);
 
             try {
@@ -963,9 +970,14 @@
                 });
                 
                 const resultJSON = await response.json(); let aiAnswer = resultJSON.choices[0].message.content;
-                chatHistory.push({ role: "assistant", content: aiAnswer }); sessions[currentSessionId].history = chatHistory; saveToLocal(); renderSidebar();
-                outputArea.innerHTML += `<div class="msg-ai">${aiAnswer}</div>`;
-            } catch (error) { outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; }
+                chatHistory.push({ role: "assistant", content: aiAnswer }); 
+                sessions[currentSessionId].history = chatHistory; 
+                saveToLocal(); 
+                renderSidebar();
+                if(outputArea) outputArea.innerHTML += `<div class="msg-ai">${aiAnswer}</div>`;
+            } catch (error) { 
+                if(outputArea) outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; 
+            }
         }
 
         function renderMedia(url, modelName) {
