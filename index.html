@@ -135,7 +135,6 @@
         .btn-global-import { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 10px 18px; background: rgba(112, 0, 255, 0.15); border: 1px solid var(--secondary); border-radius: 8px; color: #fff; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(112, 0, 255, 0.3); display: flex; align-items: center; gap: 6px; }
         .btn-global-import:hover { background: var(--secondary); box-shadow: 0 0 25px rgba(112, 0, 255, 0.8); text-shadow: 0 0 5px #fff; }
 
-        /* 🚀 新增：手机端专属媒体导出按钮样式（平时隐藏，手机端显示） */
         .btn-mobile-export { display: none; }
 
         @media (max-width: 768px) {
@@ -189,7 +188,6 @@
 
             #output-area, #video-output-area { height: 350px; padding: 15px; font-size: 13px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
             
-            /* 🚀 新增：手机端专属媒体导出大按钮样式激活 */
             .btn-mobile-export { display: block; width: 100%; padding: 14px; background: rgba(16, 185, 129, 0.15); border: none; border-top: 1px dashed rgba(16, 185, 129, 0.5); color: #10b981; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; transition: 0.3s; border-radius: 0 0 16px 16px; margin-top: 0; }
             .btn-mobile-export:hover, .btn-mobile-export:active { background: #10b981; color: #000; }
 
@@ -811,6 +809,8 @@
             syncQuantManifest(); 
             closeGemRunModal();
             appendSysLog(`已从策略沙盒触发全局投递...`); 
+            
+            // 🚀 修复调用主命令函数
             executeCommand();
         }
 
@@ -907,12 +907,14 @@
         function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
+        // 🚀 修复核心执行函数的挂载定义
         async function executeCommand() {
             let query = document.getElementById('queryArea').value.trim();
             const apiUrl = document.getElementById('api-main-url').value.trim();
             const apiModel = document.getElementById('api-main-model').value.trim();
             const apiKey = document.getElementById('api-main-key').value.trim();
-            if (!query) return; saveConfigToLocal();
+            if (!query) return; 
+            saveConfigToLocal();
             
             if (sessions[currentSessionId].title === "新策略层") {
                 sessions[currentSessionId].title = query.substring(0, 12) + '...';
@@ -1024,8 +1026,7 @@
 
                 if (!response.ok) { const errText = await response.text(); throw new Error(`网关异常 状态码: ${response.status} - ${errText.substring(0, 120)}`); }
                 const result = await response.json();
-                appendSysLog(`投递成功，解析网关回传结果...`);
-
+                
                 let mediaUrlSrc = result.video_url || result.image_url || result.url || (result.video && result.video.url) || (result.data && result.data[0]?.url) || "";
                 if (!mediaUrlSrc && result.choices && result.choices[0]?.message?.content) {
                     let content = result.choices[0].message.content; let urlMatch = content.match(/https?:\/\/[^\s"']+/); if (urlMatch) mediaUrlSrc = urlMatch[0];
@@ -1033,7 +1034,7 @@
                 let taskId = result.id || result.task_id || result.request_id || "";
 
                 if (mediaUrlSrc) {
-                    currentGeneratedMediaUrl = mediaUrlSrc; // 💾 同步挂载导出变量
+                    currentGeneratedMediaUrl = mediaUrlSrc; 
                     vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(mediaUrlSrc, videoModel)}<div style="font-size:11px; color:#10b981;">✔ 全量媒体渲染成功！</div></div>`;
                 } else if (taskId && !mediaUrlSrc) {
                     vOutput.innerHTML = `<div style="width:100%; font-size:13px;"><div style="color:#f59e0b;">✔ 任务派发成功！ID: ${taskId}</div><div id="polling-status" style="color:#00f0ff; margin-top:10px; font-weight:bold;">正在云端异步渲染融合中... ⏳</div></div>`;
@@ -1048,7 +1049,7 @@
                                 let finalUrl = checkData.video_url || checkData.image_url || checkData.url || (checkData.video && checkData.video.url) || "";
                                 if (finalUrl) { 
                                     clearInterval(checkInterval); 
-                                    currentGeneratedMediaUrl = finalUrl; // 💾 同步挂载异步轮询出的导出变量
+                                    currentGeneratedMediaUrl = finalUrl; 
                                     vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">${renderMedia(finalUrl, videoModel)}</div>`; 
                                 }
                             }
