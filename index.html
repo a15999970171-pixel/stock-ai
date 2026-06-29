@@ -8,7 +8,6 @@
         :root { --primary: #00f0ff; --secondary: #7000ff; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --border: rgba(0, 240, 255, 0.3); --danger: #ef4444; --text: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'PingFang SC', sans-serif; }
         
-        /* 移动端细滚动条重置 */
         * { scrollbar-width: thin; scrollbar-color: rgba(0, 240, 255, 0.2) transparent; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-thumb { background-color: rgba(0, 240, 255, 0.2); border-radius: 10px; }
@@ -19,10 +18,8 @@
         .cyber-bg::before { content: ""; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg); animation: grid-move 10s linear infinite; }
         @keyframes grid-move { from { background-position: 0 0; } to { background-position: 0 40px; } }
         
-        /* 双端响应式大容器 */
         .app-container { display: flex; width: 100%; max-width: 1400px; gap: 20px; align-items: flex-start; }
         
-        /* 左侧边栏 */
         .sidebar { width: 280px; flex-shrink: 0; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); position: sticky; top: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); z-index: 10; }
         .btn-new-chat { width: 100%; padding: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
         .btn-new-chat:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
@@ -37,7 +34,6 @@
         
         .session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         
-        /* 策略层 (Session) 样式升级：变成 AI 文本框形态 */
         .session-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; transition: 0.2s; }
         .session-item:hover { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
         .session-item.active { border-color: var(--primary); background: rgba(0, 240, 255, 0.1); border-left: 4px solid var(--primary); }
@@ -47,7 +43,6 @@
         .btn-del-session { background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center; align-self: center; }
         .btn-del-session:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
         
-        /* 导航与框架 */
         .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; gap: 20px; }
         .seedacen-nav { display: flex; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; flex-shrink: 0; }
         .nav-tab { padding: 12px 24px; cursor: pointer; font-size: 14px; font-weight: bold; color: #64748b; border-radius: 8px 8px 0 0; transition: 0.3s; border: 1px solid transparent; border-bottom: none; position: relative; }
@@ -57,7 +52,6 @@
         .tab-content { display: none; width: 100%; flex-direction: column; gap: 20px; }
         .tab-content.active { display: flex; }
 
-        /* 表单与通用 UI */
         .container, .box-container { width: 100%; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); }
         .container { padding: 25px 30px; }
         h1 { font-size: 1.5rem; color: var(--primary); text-align: center; margin-bottom: 20px; letter-spacing: 2px; text-shadow: 0 0 10px var(--primary); }
@@ -88,7 +82,6 @@
         .btn-run { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 2px; transition: 0.3s; }
         .btn-run:hover { filter: brightness(1.2); box-shadow: 0 0 20px var(--primary); }
         
-        /* 隐藏日志面板 */
         .btn-log-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 1000; padding: 12px 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
         .btn-log-toggle:hover { background: var(--primary); color: #000; box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
         .log-panel { position: fixed; bottom: 70px; right: 20px; width: 450px; height: 350px; background: rgba(5, 9, 20, 0.95); border: 1px solid var(--border); border-radius: 12px; z-index: 999; display: flex; flex-direction: column; transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.8); visibility: hidden; }
@@ -98,7 +91,6 @@
         .log-entry { margin-bottom: 6px; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 4px; } .log-entry.error { color: var(--danger); } .log-entry.warn { color: #f59e0b; }
         .box-container.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: 100vw; z-index: 9999; border-radius: 0; margin: 0; } .box-container.fullscreen textarea { height: calc(100vh - 120px); font-size: 18px; }
         
-        /* 悬浮资产栏样式 */
         .fancy-upload-bar { display: flex; align-items: center; gap: 10px; padding: 8px 15px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); }
         .btn-fancy-upload { display: flex; align-items: center; gap: 6px; background: rgba(112,0,255,0.15); border: 1px dashed var(--secondary); padding: 6px 12px; border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; transition: 0.2s; }
         .btn-fancy-upload:hover { background: rgba(112,0,255,0.3); border-color: var(--primary); text-shadow: 0 0 5px var(--primary); }
@@ -115,7 +107,6 @@
         .asset-pill-btn-del { background: transparent; border: none; color: #ef4444; font-size: 14px; margin-left: 6px; cursor: pointer; padding: 0 4px; opacity: 0.7; }
         .asset-pill-btn-del:hover { opacity: 1; }
 
-        /* @ 补全联想菜单 */
         .mention-menu { display: none; position: absolute; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--secondary); border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.9); z-index: 100; max-height: 180px; overflow-y: auto; width: 250px; top: 30px; left: 15px; }
         .mention-menu.show { display: block; }
         .mention-item { padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; font-size: 12px; }
@@ -124,92 +115,78 @@
         .mention-icon img { width: 100%; height: 100%; object-fit: cover; }
         .textarea-wrapper { position: relative; width: 100%; }
 
-        /* 多模态全量清单输出看板 */
         .multimodal-manifest { display: flex; flex-direction: column; gap: 8px; padding: 12px 15px; background: rgba(0, 240, 255, 0.03); border-top: 1px dashed var(--border); font-size: 12px; }
         .manifest-title { font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 5px; }
         .manifest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 5px; }
         .manifest-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; overflow: hidden; }
         
-        /* 钻石图标像素级对齐优化 */
         .manifest-card span { color: #94a3b8; font-weight: bold; display: flex; align-items: center; min-width: 105px; flex-shrink: 0; }
         .manifest-icon { font-style: normal; display: inline-block; width: 24px; text-align: left; margin-right: 2px; }
         
         .manifest-card p { color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
         .manifest-thumb { width: 20px; height: 20px; border-radius: 3px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* Modal 弹窗 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .modal-overlay.show { display: flex; }
         .modal-box { background: rgba(5, 9, 20, 0.98); border: 1px solid var(--secondary); border-radius: 12px; width: 500px; max-width: 90%; padding: 25px; display: flex; flex-direction: column; gap: 15px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 16px; font-weight: bold; border-bottom: 1px solid rgba(112,0,255,0.3); padding-bottom: 10px; }
         .modal-close { background: transparent; border: none; color: #64748b; font-size: 20px; cursor: pointer; }
 
-        /* ========================================================== */
-        /* 📱 极客自适应核心：手机端与移动端排版重塑样式 */
-        /* ========================================================== */
+        .btn-global-import { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 10px 18px; background: rgba(112, 0, 255, 0.15); border: 1px solid var(--secondary); border-radius: 8px; color: #fff; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(112, 0, 255, 0.3); display: flex; align-items: center; gap: 6px; }
+        .btn-global-import:hover { background: var(--secondary); box-shadow: 0 0 25px rgba(112, 0, 255, 0.8); text-shadow: 0 0 5px #fff; }
+
         @media (max-width: 768px) {
             body { padding: 10px; }
             .app-container { flex-direction: column; gap: 15px; }
             
-            /* 手机侧边栏重塑：变为顶部流式挂载区 */
             .sidebar { width: 100%; height: auto; position: relative; top: 0; border-radius: 12px; padding: 15px; box-shadow: none; z-index: 1; display: flex; flex-direction: column; }
             .btn-new-chat { order: 1; margin-bottom: 10px; padding: 14px; font-size: 15px; }
-            /* 手机专属标题显现，直接在新建按钮下方 */
             .mobile-session-header { order: 2; display: block; color: var(--secondary); font-size: 13px; font-weight: bold; margin-bottom: 8px; margin-top: 5px; }
             .session-list { order: 3; max-height: 200px; gap: 8px; margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 15px; }
             .gems-header { order: 4; margin-top: 5px; }
             .gems-list { order: 5; max-height: 180px; gap: 8px; }
             .divider { display: none; }
             
-            /* 防误触：列表间距放大 */
             .gem-item { padding: 14px 12px; font-size: 14px; }
             .session-item { padding: 14px 12px; }
             .btn-del-session { font-size: 18px; padding: 6px; }
 
-            /* 【防挤压】工作区导航栏允许横向滚动 */
             .seedacen-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
             .nav-tab { padding: 12px 18px; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
 
-            /* 手机配置卡槽排版重塑 */
             .container { padding: 15px; border-radius: 12px; }
             h1 { font-size: 1.2rem; margin-bottom: 15px; }
             .input-row { flex-direction: column; gap: 12px; }
             .config-group { margin-bottom: 12px; }
-            /* 【防误触】放大所有的输入框与下拉选单 */
             .config-group input, .config-group select { padding: 14px 12px; font-size: 14px; }
             .btn-add { padding: 14px; font-size: 15px; }
             
-            /* 业务执行面板头部布局调整，防止拥挤 */
             .box-header { flex-wrap: wrap; gap: 10px; padding: 12px 15px; }
             .control-btn { width: 34px; height: 34px; font-size: 16px; } 
 
-            /* 【防手滑】主输入区域高度扩大 */
             textarea { height: 140px; font-size: 14px; padding: 15px; }
             .btn-run { padding: 16px; font-size: 16px; border-radius: 8px; margin-top: 5px; }
             
-            /* 【宽屏化】多模态载入按钮撑满，绝不局促 */
             .fancy-upload-bar { padding: 12px 10px; flex-wrap: wrap; justify-content: center; gap: 10px; }
             .btn-fancy-upload { width: 100%; justify-content: center; padding: 14px; font-size: 14px; }
             .asset-pill { padding: 8px 10px 8px 12px; font-size: 13px; }
             .asset-pill-icon { width: 26px; height: 26px; }
             .asset-pill-btn-del { font-size: 18px; padding: 6px 10px; margin-left: 8px; }
 
-            /* 手机胶囊池与清单响应式缩进 */
             .manifest-grid { grid-template-columns: 1fr; gap: 8px; }
             
-            /* 【防溢出】弹窗自适应优化 */
             .modal-box { padding: 20px 15px; width: 95%; max-height: 90vh; overflow-y: auto; }
             .modal-body input, .modal-body textarea { padding: 14px; font-size: 14px; }
             .btn-save-gem { padding: 14px; font-size: 15px; }
             #gemRunModal .box-container { width: 95% !important; margin: auto; }
             
-            /* 【精准点选】联想菜单自适应 */
             .mention-menu { width: calc(100vw - 50px); left: 15px; max-height: 220px; }
             .mention-item { padding: 14px; font-size: 14px; }
             .mention-icon { width: 30px; height: 30px; }
 
-            /* 日志与输出窗口重塑 */
             #output-area, #video-output-area { height: 350px; padding: 15px; font-size: 13px; }
+            
+            .btn-global-import { top: 10px; right: 10px; font-size: 12px; padding: 8px 12px; z-index: 1002; }
             .log-panel { width: calc(100vw - 20px); right: 10px; left: 10px; bottom: 65px; height: 350px; z-index: 1001; }
             .btn-log-toggle { padding: 12px 16px; font-size: 13px; bottom: 10px; right: 10px; }
         }
@@ -217,6 +194,11 @@
 </head>
 <body>
     <div class="cyber-bg"></div>
+    
+    <button class="btn-global-import" onclick="openImportModal()">
+        <span style="font-size:16px;">⇘</span> 导入API
+    </button>
+
     <div class="app-container">
         <div class="sidebar">
             <button class="btn-new-chat" onclick="createNewSession()"><span>+</span> 新建策略对话</button>
@@ -420,13 +402,33 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="importModal">
+        <div class="modal-box" style="background: linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(2,6,23,0.98) 100%); border: 1px solid var(--secondary); box-shadow: 0 0 40px rgba(112,0,255,0.3);">
+            <div class="modal-header">
+                <span style="color:var(--primary); display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:18px;">⇘</span> BATCH API IMPORT (批量节点极速注入)
+                </span>
+                <button class="modal-close" onclick="closeImportModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <label style="color:#00f0ff; font-weight:bold;">粘贴目标地址与模型 (回车换行分隔，按顺序自动靶向注入配置框)</label>
+                <div style="font-size:11px; color:#94a3b8; margin-top:-8px; margin-bottom:8px;">
+                    第1行 👉 主模型端点 URL<br>
+                    第2行 👉 主模型名称 (Model ID)<br>
+                    第3行 👉 视频矩阵端点 URL<br>
+                    第4行及之后 👉 自动扩容并注入辅助参考节点
+                </div>
+                <textarea id="importArea" style="height: 160px; border-color: rgba(0,240,255,0.3); background: rgba(0,0,0,0.6);" placeholder="https://api.openai.com/v1/chat/completions\ngpt-4o\nhttps://api.x.ai/v1/images/generations\nhttps://api.data1.com/api/v1/..."></textarea>
+                <button class="btn-run" style="background: linear-gradient(90deg, #00f0ff, var(--secondary)); margin-top: 5px;" onclick="executeImport()">解析并极速注入 / PARSE & INJECT</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 【核心】给 Session 对象增加 queryText 字段，用于保存每个图层的输入框内容
         let sessions = JSON.parse(localStorage.getItem('geek_sessions')) || {};
         let gems = JSON.parse(localStorage.getItem('geek_gems')) || [];
         let currentSessionId = null; let chatHistory = [];
         
-        // 联邦多模态核心资产结构（按工作区分类）
         let assetsMap = { quant: [], video: [] };
         let mentionStates = {
             quant: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'queryArea', menuId: 'quantMentionMenu' },
@@ -446,8 +448,6 @@
             
             renderGems(); 
             renderAssetsPool('quant'); renderAssetsPool('video');
-            
-            // 初始化联想菜单监听
             initMentionSystem('quant'); initMentionSystem('video');
 
             const sessionIds = Object.keys(sessions);
@@ -485,7 +485,46 @@
             logContent.appendChild(entry); logContent.scrollTop = logContent.scrollHeight;
         }
 
-        /* ================= 全量多模态批量引入核心处理流 ================= */
+        /* ======== 🚀 API 批量导入核心解析逻辑 ======== */
+        function openImportModal() { document.getElementById('importModal').classList.add('show'); }
+        function closeImportModal() { document.getElementById('importModal').classList.remove('show'); document.getElementById('importArea').value = ''; }
+        
+        function executeImport() {
+            const importText = document.getElementById('importArea').value;
+            const lines = importText.split('\n').map(l => l.trim()).filter(l => l !== '');
+            if (lines.length === 0) {
+                alert("未检测到任何有效内容！");
+                return;
+            }
+
+            if (lines[0]) document.getElementById('api-main-url').value = lines[0];
+            if (lines[1]) document.getElementById('api-main-model').value = lines[1];
+            if (lines[2]) document.getElementById('api-video-url').value = lines[2];
+
+            if (lines.length > 3) {
+                const wrapper = document.getElementById('dynamic-nodes-wrapper');
+                wrapper.innerHTML = ''; 
+                
+                const existingRefInputs = document.querySelectorAll('.container .ref-api-input'); 
+                
+                for (let i = 3; i < lines.length; i++) {
+                    const nodeIndex = i - 3;
+                    if (nodeIndex < 2) {
+                        existingRefInputs[nodeIndex].value = lines[i];
+                    } else {
+                        addNode();
+                        const newInputs = document.querySelectorAll('.dynamic-node .ref-api-input');
+                        newInputs[newInputs.length - 1].value = lines[i];
+                    }
+                }
+            }
+
+            saveConfigToLocal();
+            closeImportModal();
+            appendSysLog(`✔ 批量导入成功！共解析并挂载了 ${lines.length} 条配置。`);
+        }
+        /* ================================================== */
+
         async function handleAssetSelect(e, scope) {
             const files = e.target.files; if (!files || files.length === 0) return;
             appendSysLog(`[${scope}] 正在导入 ${files.length} 个多模态联邦资产...`);
@@ -546,7 +585,6 @@
 
         function removeAsset(scope, index) { assetsMap[scope].splice(index, 1); renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
 
-        /* ================= 智能 @ 联想双端事件绑定 ================= */
         function initMentionSystem(scope) {
             const state = mentionStates[scope];
             const area = document.getElementById(state.areaId);
@@ -599,16 +637,14 @@
             if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
         }
 
-        /* 实时全量看板联邦刷入 + 自动绑定当前图层输入框 */
         function syncQuantManifest() {
             saveConfigToLocal(); 
             const query = document.getElementById('queryArea').value;
             
-            // 【核心修复】将当前文本框里的字，实时保存在当前激活的 Session 图层里
             if (currentSessionId && sessions[currentSessionId]) {
                 sessions[currentSessionId].queryText = query;
                 saveToLocal();
-                renderSidebar(); // 实时刷新左侧的文本预览气泡
+                renderSidebar(); 
             }
 
             const grid = document.getElementById('quant-manifest-grid'); 
@@ -650,7 +686,6 @@
             });
         }
 
-        /* ================= 💎 Gems 核心控制流 (升级版) ================= */
         function openGemsModal() { document.getElementById('gemModal').classList.add('show'); }
         function closeGemsModal() { document.getElementById('gemModal').classList.remove('show'); }
         function saveGem() {
@@ -698,9 +733,6 @@
 
         function deleteGem(e, i) { e.stopPropagation(); gems.splice(i, 1); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); }
 
-        /* ============================================================= */
-
-        /* 【升级】左侧文本框形态的多图层 (Session) 逻辑 */
         function renderSidebar() {
             const sessionListEl = document.getElementById('session-list');
             sessionListEl.innerHTML = ''; 
@@ -712,7 +744,6 @@
                 item.className = `session-item ${isActive ? 'active' : ''}`; 
                 item.onclick = () => loadSession(id);
                 
-                // 获取当前层保存的预览文字
                 let previewText = sessions[id].queryText || "";
                 
                 item.innerHTML = `
@@ -727,10 +758,8 @@
         }
         
         function createNewSession() { 
-            // 【核心修复】：防止疯狂点击新建导致空白图层无限堆叠
             if (currentSessionId && sessions[currentSessionId]) {
                 const cur = sessions[currentSessionId];
-                // 如果当前层本身就没有任何历史对话，且文本框里啥也没打，那就直接清空焦点，不要再建新层了
                 if (cur.history.length === 0 && (!cur.queryText || cur.queryText.trim() === '')) {
                     document.getElementById('queryArea').value = '';
                     syncQuantManifest();
@@ -741,10 +770,8 @@
 
             currentSessionId = 'session_' + Date.now(); 
             chatHistory = []; 
-            // 初始化新的图层，自带 queryText 属性
             sessions[currentSessionId] = { title: "新策略层", history: [], queryText: "" }; 
             
-            // 新建时，强行清空右侧的输入框，给用户一张白纸
             document.getElementById('queryArea').value = '';
             syncQuantManifest();
             
@@ -757,14 +784,12 @@
             currentSessionId = id; 
             chatHistory = sessions[id].history || []; 
             
-            // 点击历史图层时，把该图层保存的内容强行恢复到输入框里
             document.getElementById('queryArea').value = sessions[id].queryText || '';
             syncQuantManifest();
 
             renderSidebar(); 
             outputArea.innerHTML = '';
             
-            // 恢复历史回包内容
             chatHistory.forEach(m => {
                 let txt = typeof m.content === 'string' ? m.content : m.content.find(t=>t.type==='text')?.text || '';
                 if(txt.includes('用户动态条件：\n')) txt = txt.split('用户动态条件：\n')[1].split('\n\n【辅助节点】')[0];
@@ -777,11 +802,9 @@
             delete sessions[id]; 
             saveToLocal(); 
             
-            // 如果删光了，自动新建一个
             if (Object.keys(sessions).length === 0) {
                 createNewSession();
             } else {
-                // 如果删的是当前激活的，自动跳到第一个
                 if (id === currentSessionId) {
                     const remainingIds = Object.keys(sessions).reverse();
                     loadSession(remainingIds[0]);
@@ -801,7 +824,6 @@
         function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
-        /* 量化扫描执行流 (输出到分析报告) */
         async function executeCommand() {
             let query = document.getElementById('queryArea').value.trim();
             const apiUrl = document.getElementById('api-main-url').value.trim();
@@ -809,7 +831,6 @@
             const apiKey = document.getElementById('api-main-key').value.trim();
             if (!query) return; saveConfigToLocal();
             
-            // 首次执行时，将左侧图层标题改为指令的前几个字
             if (sessions[currentSessionId].title === "新策略层") {
                 sessions[currentSessionId].title = query.substring(0, 12) + '...';
                 saveToLocal();
@@ -820,14 +841,13 @@
             appendSysLog(`正在编译全量多模态联邦载荷发送给分析大脑...`);
 
             try {
-                // 捕获量化框里被 @ 引用的所有图表资产
                 let boundImages = [];
                 assetsMap.quant.forEach(asset => {
                     const tag = `@${asset.handle}`;
                     if (query.includes(tag)) {
                         if (asset.type === 'image' || asset.type === 'video') {
                             boundImages.push(asset.base64);
-                            query = query.replace(tag, `[联邦参考载荷: @${asset.handle}]`); // 替换原有标签，保留逻辑位置
+                            query = query.replace(tag, `[联邦参考载荷: @${asset.handle}]`); 
                         }
                     }
                 });
@@ -844,7 +864,6 @@
 
                 const finalPrompt = `【Quant Scanner 指令】：用户动态条件：\n${query}\n\n【辅助节点获取的数据】（Raw Data）：\n${combinedRawData}\n\n【输出要求】：推演独立完成用户要求的量化清洗排序，且不要列出被排除 company。`;
                 
-                // 将文字剧本、拉取的数据和图片资产全部打包输出
                 let messageContent = [{ type: "text", text: finalPrompt }];
                 boundImages.forEach(imgData => {
                     messageContent.push({ type: "image_url", image_url: { url: imgData } });
@@ -872,7 +891,6 @@
             }
         }
 
-        /* 视频创作中心：全量多模态输出核心实现 */
         async function executeVideoGeneration() {
             let scriptPrompt = document.getElementById('videoQueryArea').value.trim();
             let videoUrl = document.getElementById('api-video-url').value.trim() || document.getElementById('api-main-url').value.trim();
