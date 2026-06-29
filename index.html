@@ -30,8 +30,8 @@
         .btn-add-gem { background: transparent; border: none; color: var(--secondary); font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-add-gem:hover { color: #fff; text-shadow: 0 0 8px var(--secondary); }
         .gems-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; flex-shrink: 0; max-height: 180px; overflow-y: auto; padding-right: 5px; }
-        .gem-item { background: rgba(112, 0, 255, 0.1); border: 1px dashed rgba(112, 0, 255, 0.4); border-radius: 6px; padding: 10px; cursor: pointer; font-size: 13px; color: #cbd5e1; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
-        .gem-item:hover { background: rgba(112, 0, 255, 0.25); border-color: var(--secondary); color: #fff; }
+        .gem-item { background: rgba(112, 0, 255, 0.05); border: 1px solid rgba(112, 0, 255, 0.3); border-radius: 8px; padding: 12px; cursor: pointer; font-size: 13px; color: #cbd5e1; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; }
+        .gem-item:hover { background: rgba(112, 0, 255, 0.2); border-color: var(--primary); color: #fff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); transform: translateX(2px); }
         .session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         .session-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
         .session-item:hover { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
@@ -128,45 +128,76 @@
         .manifest-thumb { width: 20px; height: 20px; border-radius: 3px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
 
         /* Modal 弹窗 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .modal-overlay.show { display: flex; }
         .modal-box { background: rgba(5, 9, 20, 0.98); border: 1px solid var(--secondary); border-radius: 12px; width: 500px; max-width: 90%; padding: 25px; display: flex; flex-direction: column; gap: 15px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 16px; font-weight: bold; border-bottom: 1px solid rgba(112,0,255,0.3); padding-bottom: 10px; }
         .modal-close { background: transparent; border: none; color: #64748b; font-size: 20px; cursor: pointer; }
 
         /* ========================================================== */
-        /* 📱 极客自适应核心：手机端与移动端排版重塑样式 (CORS Mobile) */
+        /* 📱 极客自适应核心：手机端与移动端排版重塑样式 (重点修复触控区) */
         /* ========================================================== */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .app-container { flex-direction: column; gap: 15px; }
             
-            /* 手机侧边栏重塑：变为顶部流式挂载区 */
-            .sidebar { width: 100%; height: auto; position: relative; top: 0; border-radius: 12px; padding: 15px; box-shadow: none; }
-            .btn-new-chat { margin-bottom: 12px; padding: 10px; font-size: 14px; }
-            .gems-list { max-height: 120px; gap: 6px; }
-            .session-list { max-height: 150px; gap: 6px; }
-            .session-item { padding: 10px; }
+            /* 手机侧边栏重塑：变为顶部流式挂载区，去除高度限制防重叠 */
+            .sidebar { width: 100%; height: auto; position: relative; top: 0; border-radius: 12px; padding: 15px; box-shadow: none; z-index: 1; }
+            
+            /* 【防误触】全方位放大左侧交互按钮与列表间距 */
+            .btn-new-chat { margin-bottom: 15px; padding: 14px; font-size: 15px; }
+            .gems-list { max-height: 180px; gap: 8px; }
+            .gem-item { padding: 14px 12px; font-size: 14px; }
+            .session-list { max-height: 200px; gap: 8px; }
+            .session-item { padding: 14px 12px; }
+            .btn-del-session { font-size: 18px; padding: 6px; }
+
+            /* 【防挤压】工作区导航栏允许横向滚动 */
+            .seedacen-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+            .nav-tab { padding: 12px 18px; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
 
             /* 手机配置卡槽排版重塑 */
             .container { padding: 15px; border-radius: 12px; }
             h1 { font-size: 1.2rem; margin-bottom: 15px; }
             .input-row { flex-direction: column; gap: 12px; }
-            .config-group { margin-bottom: 10px; }
-            .config-group input, .config-group select { padding: 12px; font-size: 13px; }
+            .config-group { margin-bottom: 12px; }
+            /* 【防误触】放大所有的输入框与下拉选单 */
+            .config-group input, .config-group select { padding: 14px 12px; font-size: 14px; }
+            .btn-add { padding: 14px; font-size: 15px; }
             
-            /* 手机大输入框高度调整，更利于手触 */
-            textarea { height: 100px; font-size: 14px; padding: 10px; }
-            #output-area, #video-output-area { height: 300px; padding: 12px; font-size: 13px; }
-            .btn-run { padding: 14px; font-size: 15px; border-radius: 8px; }
+            /* 业务执行面板头部布局调整，防止拥挤 */
+            .box-header { flex-wrap: wrap; gap: 10px; padding: 12px 15px; }
+            .control-btn { width: 34px; height: 34px; font-size: 16px; } 
+
+            /* 【防手滑】主输入区域高度扩大 */
+            textarea { height: 140px; font-size: 14px; padding: 15px; }
+            .btn-run { padding: 16px; font-size: 16px; border-radius: 8px; margin-top: 5px; }
             
-            /* 日志面板手机自适应宽屏 */
-            .log-panel { width: calc(100vw - 20px); right: 10px; left: 10px; bottom: 65px; height: 280px; }
-            .btn-log-toggle { padding: 10px 15px; font-size: 12px; bottom: 10px; right: 10px; }
-            
+            /* 【宽屏化】多模态载入按钮撑满，绝不局促 */
+            .fancy-upload-bar { padding: 12px 10px; flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .btn-fancy-upload { width: 100%; justify-content: center; padding: 14px; font-size: 14px; }
+            .asset-pill { padding: 8px 10px 8px 12px; font-size: 13px; }
+            .asset-pill-icon { width: 26px; height: 26px; }
+            .asset-pill-btn-del { font-size: 18px; padding: 6px 10px; margin-left: 8px; }
+
             /* 手机胶囊池与清单响应式缩进 */
-            .manifest-grid { grid-template-columns: 1fr; gap: 6px; }
-            .fancy-upload-bar { padding: 8px 10px; flex-wrap: wrap; }
+            .manifest-grid { grid-template-columns: 1fr; gap: 8px; }
+            
+            /* 【防溢出】弹窗自适应优化 */
+            .modal-box { padding: 20px 15px; width: 95%; max-height: 90vh; overflow-y: auto; }
+            .modal-body input, .modal-body textarea { padding: 14px; font-size: 14px; }
+            .btn-save-gem { padding: 14px; font-size: 15px; }
+            #gemRunModal .box-container { width: 95% !important; margin: auto; }
+            
+            /* 【精准点选】联想菜单自适应 */
+            .mention-menu { width: calc(100vw - 50px); left: 15px; max-height: 220px; }
+            .mention-item { padding: 14px; font-size: 14px; }
+            .mention-icon { width: 30px; height: 30px; }
+
+            /* 日志与输出窗口重塑 */
+            #output-area, #video-output-area { height: 350px; padding: 15px; font-size: 13px; }
+            .log-panel { width: calc(100vw - 20px); right: 10px; left: 10px; bottom: 65px; height: 350px; z-index: 1001; }
+            .btn-log-toggle { padding: 12px 16px; font-size: 13px; bottom: 10px; right: 10px; }
         }
     </style>
 </head>
@@ -350,12 +381,27 @@
 
     <div class="modal-overlay" id="gemModal">
         <div class="modal-box">
-            <div class="modal-header"><span>新建静态提示词预设 (Gems)</span><button class="control-btn" onclick="closeGemModal()">✕</button></div>
+            <div class="modal-header"><span>新建静态提示词预设 (Gems)</span><button class="control-btn" onclick="closeGemsModal()">✕</button></div>
             <div class="modal-body">
                 <label>预设标题 / Title</label><input type="text" id="gemTitle" placeholder="如：美股深度清洗规约">
                 <label>核心条件静态注入文本 / Prompt Content</label><textarea id="gemContent" style="height:120px; border:1px solid var(--border); border-radius:6px; background:#000;" placeholder="填入需要锁定的指令..."></textarea>
                 <button class="btn-run" onclick="saveGem()">锁定并注入侧边栏</button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="gemRunModal">
+        <div class="box-container" style="width: 800px; max-width: 95%; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--primary); box-shadow: 0 10px 40px rgba(0,240,255,0.3); border-radius: 12px; margin: auto;">
+            <div class="box-header">
+                <span class="box-title query-title" id="runGemTitle" style="color: #f59e0b; display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span> GEM_EXECUTE (策略沙盒执行器)
+                </span>
+                <div class="controls">
+                    <button class="control-btn" onclick="closeGemRunModal()" title="关闭">✕</button>
+                </div>
+            </div>
+            <textarea id="gemRunArea" style="height: 180px; font-size: 15px; border-radius:0;" placeholder="预设指令内容..."></textarea>
+            <button class="btn-run" style="border-radius: 0 0 12px 12px; background: linear-gradient(90deg, #10b981, var(--primary));" onclick="executeGemCommand()">执行当前预设策略 / RUN GEM</button>
         </div>
     </div>
 
@@ -575,27 +621,67 @@
             });
         }
 
-        /* Gems */
+        /* ================= 💎 Gems 核心控制流 (升级版) ================= */
         function openGemsModal() { document.getElementById('gemModal').classList.add('show'); }
         function closeGemsModal() { document.getElementById('gemModal').classList.remove('show'); }
         function saveGem() {
             const name = document.getElementById('gemTitle').value.trim(); const prompt = document.getElementById('gemContent').value.trim();
             if(!name || !prompt) return; gems.push({ name, prompt }); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); closeGemsModal();
         }
+        
+        // 💎 升级 1：给 Gems 列表加上炫酷的钻石图标和更精美的排版
         function renderGems() {
             const box = document.getElementById('gems-list'); box.innerHTML = '';
             gems.forEach((g, i) => {
                 const d = document.createElement('div'); d.className = 'gem-item';
-                d.innerHTML = `<div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" onclick="applyGem(${i})">✨ ${g.name}</div><button class="btn-del-session" onclick="deleteGem(event, ${i})">✕</button>`;
+                d.innerHTML = `
+                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:8px;" onclick="applyGem(${i})">
+                        <span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span> 
+                        <span style="font-weight:bold;">${g.name}</span>
+                    </div>
+                    <button class="btn-del-session" onclick="deleteGem(event, ${i})">✕</button>
+                `;
                 box.appendChild(d);
             });
         }
+        
+        // 💎 升级 2：点击 Gem 不再直接粘贴，而是弹出独立的高级运行对话框
         function applyGem(i) { 
-            const activeTabId = document.querySelector('.tab-content.active').id;
-            if (activeTabId === 'quant-workspace') { document.getElementById('queryArea').value = gems[i].prompt; syncQuantManifest(); } 
-            else { document.getElementById('videoQueryArea').value = gems[i].prompt; syncVideoManifest(); }
+            const gemObj = gems[i];
+            document.getElementById('runGemTitle').innerHTML = `<span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span> 策略预设：${gemObj.name}`;
+            document.getElementById('gemRunArea').value = gemObj.prompt;
+            document.getElementById('gemRunModal').classList.add('show');
+            appendSysLog(`装载预设 Gem [${gemObj.name}] 至执行沙盒，等待指令...`); 
         }
+
+        function closeGemRunModal() {
+            document.getElementById('gemRunModal').classList.remove('show');
+        }
+
+        // 💎 升级 3：独立的 Gem 执行引擎，完美回传到分析报告
+        function executeGemCommand() {
+            const gemText = document.getElementById('gemRunArea').value.trim();
+            if(!gemText) return;
+
+            // 1. 确保将界面强行切回到“量化扫描终端”，以保证结果输出位置正确
+            switchWorkspace('quant-workspace', document.querySelector('.nav-tab'));
+            
+            // 2. 将修改后的 Gem 内容自动映射到主指令框
+            document.getElementById('queryArea').value = gemText;
+            syncQuantManifest(); // 同步底下的看板清单
+
+            // 3. 关闭专属弹窗
+            closeGemRunModal();
+
+            appendSysLog(`已从策略沙盒触发全局投递...`); 
+            
+            // 4. 调用核心的主执行函数，自然输出到“分析报告”
+            executeCommand();
+        }
+
         function deleteGem(e, i) { e.stopPropagation(); gems.splice(i, 1); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); }
+
+        /* ============================================================= */
 
         /* Session 逻辑 */
         function renderSidebar() {
@@ -626,7 +712,7 @@
         function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
-        /* ================= 量化大模型终端：全量多模态输出核心实现 ================= */
+        /* 量化扫描执行流 (输出到分析报告) */
         async function executeCommand() {
             let query = document.getElementById('queryArea').value.trim();
             const apiUrl = document.getElementById('api-main-url').value.trim();
@@ -683,7 +769,15 @@
             } catch (error) { outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; }
         }
 
-        /* ================= 视频创作中心：全量多模态输出核心实现 ================= */
+        function renderMedia(url, modelName) {
+            if (url.match(/\.(mp4|webm|mov)$/i) || modelName.toLowerCase().includes('video') || modelName.toLowerCase().includes('runway') || modelName.toLowerCase().includes('sora') || modelName.toLowerCase().includes('luma')) {
+                return `<video src="${url}" controls autoplay loop style="max-width:100%; max-height:280px; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 20px rgba(0,240,255,0.2);"></video>`;
+            } else {
+                return `<img src="${url}" style="max-width:100%; max-height:280px; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 20px rgba(0,240,255,0.2);">`;
+            }
+        }
+
+        /* 视频创作中心：全量多模态输出核心实现 */
         async function executeVideoGeneration() {
             let scriptPrompt = document.getElementById('videoQueryArea').value.trim();
             let videoUrl = document.getElementById('api-video-url').value.trim() || document.getElementById('api-main-url').value.trim();
