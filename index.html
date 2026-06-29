@@ -245,7 +245,10 @@
                         <input type="text" class="ref-api-input" placeholder="填入通用 API 或以 http 开头的网址...">
                     </div>
                     <div id="dynamic-nodes-wrapper"></div>
-                    <button class="btn-add" onclick="addNode()"><span>+</span> 增加更多参考节点</button>
+                    <div class="input-row" style="margin-bottom: -5px;">
+                        <button class="btn-add" style="flex: 1;" onclick="addNode()"><span>+</span> 增加更多参考节点</button>
+                        <button class="btn-add" style="flex: 1; background: rgba(112, 0, 255, 0.15); border: 1px dashed var(--secondary); color: #fff; box-shadow: 0 0 10px rgba(112,0,255,0.2);" onclick="openImportModal()"><span style="font-size:14px;">⇘</span> 一键导入 API 与数据源</button>
+                    </div>
                 </div>
                 <div class="box-container" id="queryContainer">
                     <div class="box-header">
