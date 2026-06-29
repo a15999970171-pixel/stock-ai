@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Quant & Video Dashboard - Dual Matrix Pro</title>
+    <title>Universal Quant & Media Dashboard - Trinity Matrix Pro</title>
     <style>
         :root { --primary: #00f0ff; --secondary: #7000ff; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --border: rgba(0, 240, 255, 0.3); --danger: #ef4444; --text: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'PingFang SC', sans-serif; }
         
+        /* 移动端细滚动条重置 */
         * { scrollbar-width: thin; scrollbar-color: rgba(0, 240, 255, 0.2) transparent; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-thumb { background-color: rgba(0, 240, 255, 0.2); border-radius: 10px; }
@@ -20,6 +21,7 @@
         
         .app-container { display: flex; width: 100%; max-width: 1400px; gap: 20px; align-items: flex-start; }
         
+        /* 左侧边栏 */
         .sidebar { width: 280px; flex-shrink: 0; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); position: sticky; top: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); z-index: 10; }
         .btn-new-chat { width: 100%; padding: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
         .btn-new-chat:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
@@ -33,16 +35,15 @@
         .mobile-session-header { display: none; }
         
         .session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
-        
         .session-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; transition: 0.2s; }
         .session-item:hover { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
         .session-item.active { border-color: var(--primary); background: rgba(0, 240, 255, 0.1); border-left: 4px solid var(--primary); }
         .session-preview-box { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 8px; margin-top: 6px; font-size: 12px; color: #94a3b8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; transition: 0.2s; }
         .session-item.active .session-preview-box { border-color: rgba(0, 240, 255, 0.3); color: #fff; }
-        
         .btn-del-session { background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center; align-self: center; }
         .btn-del-session:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
         
+        /* 导航与框架 */
         .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; gap: 20px; }
         .seedacen-nav { display: flex; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; flex-shrink: 0; }
         .nav-tab { padding: 12px 24px; cursor: pointer; font-size: 14px; font-weight: bold; color: #64748b; border-radius: 8px 8px 0 0; transition: 0.3s; border: 1px solid transparent; border-bottom: none; position: relative; }
@@ -75,13 +76,12 @@
         .control-btn:hover { background: rgba(255,255,255,0.2); }
         textarea { width: 100%; height: 120px; background: transparent; border: none; color: #fff; padding: 15px; font-size: 15px; line-height: 1.6; resize: none; outline: none; }
         
-        #output-area, #video-output-area { height: 420px; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.7; background: rgba(0, 0, 0, 0.7); }
+        .output-area { height: 420px; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.7; background: rgba(0, 0, 0, 0.7); }
         .msg-user { color: #f59e0b; font-weight: bold; margin-top: 15px; margin-bottom: 10px; border-left: 3px solid #f59e0b; padding-left: 10px; }
         .msg-ai { color: #ffffff; text-shadow: 0 0 8px rgba(0, 240, 255, 0.4); background: rgba(15, 23, 42, 0.7); padding: 16px; border-radius: 8px; border-left: 3px solid var(--primary); margin-bottom: 20px; white-space: pre-wrap; word-break: break-all; }
-        /* 🚀 新增：让大模型生成的图片在分析报告里极客化显示 */
         .msg-ai img { max-width: 100%; border-radius: 8px; margin-top: 12px; border: 1px solid var(--primary); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); display: block; }
-        
         .msg-error { color: #ef4444; font-weight: bold; margin-bottom: 20px; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; }
+        
         .btn-run { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 2px; transition: 0.3s; }
         .btn-run:hover { filter: brightness(1.2); box-shadow: 0 0 20px var(--primary); }
         
@@ -125,7 +125,6 @@
         
         .manifest-card span { color: #94a3b8; font-weight: bold; display: flex; align-items: center; min-width: 105px; flex-shrink: 0; }
         .manifest-icon { font-style: normal; display: inline-block; width: 24px; text-align: left; margin-right: 2px; }
-        
         .manifest-card p { color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
         .manifest-thumb { width: 20px; height: 20px; border-radius: 3px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
 
@@ -189,7 +188,7 @@
             .mention-item { padding: 14px; font-size: 14px; }
             .mention-icon { width: 30px; height: 30px; }
 
-            #output-area, #video-output-area { height: 350px; padding: 15px; font-size: 13px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+            .output-area { height: 350px; padding: 15px; font-size: 13px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
             
             .btn-mobile-export { display: block; width: 100%; padding: 14px; background: rgba(16, 185, 129, 0.15); border: none; border-top: 1px dashed rgba(16, 185, 129, 0.5); color: #10b981; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; transition: 0.3s; border-radius: 0 0 16px 16px; margin-top: 0; }
             .btn-mobile-export:hover, .btn-mobile-export:active { background: #10b981; color: #000; }
@@ -224,6 +223,7 @@
             <div class="seedacen-nav">
                 <div class="nav-tab active" onclick="switchWorkspace('quant-workspace', this)">📊 量化扫描终端</div>
                 <div class="nav-tab" onclick="switchWorkspace('video-workspace', this)">🎬 视频创作矩阵</div>
+                <div class="nav-tab" onclick="switchWorkspace('image-workspace', this)">🖼️ 图像生成矩阵</div>
             </div>
 
             <div id="quant-workspace" class="tab-content active">
@@ -295,7 +295,7 @@
                             <button class="control-btn" onclick="exportReport()" title="导出分析报告 (支持图文保留)">💾</button>
                         </div>
                     </div>
-                    <div id="output-area"></div>
+                    <div class="output-area" id="output-area"></div>
                 </div>
             </div>
 
@@ -388,10 +388,104 @@
                             <button class="control-btn" onclick="exportVideo()" title="一键导出生成的视频/媒体文件">💾</button>
                         </div>
                     </div>
-                    <div id="video-output-area"><div class="msg-sys">渲染引擎就绪。生成成功的媒体实体将在此处挂载原生播放器。</div></div>
+                    <div class="output-area" id="video-output-area" style="display: flex; align-items: center; justify-content: center;"><div class="msg-sys">渲染引擎就绪。生成成功的媒体实体将在此处挂载原生播放器。</div></div>
                     <button class="btn-mobile-export" onclick="exportVideo()">⇘ 一键导出生成的媒体文件</button>
                 </div>
             </div>
+
+            <div id="image-workspace" class="tab-content">
+                <div class="container">
+                    <h1>Image Generator Pipeline</h1>
+                    <div class="config-group">
+                        <label>✦ 图像生成端点 (API Endpoint)</label>
+                        <input type="text" id="api-image-url" placeholder="如: https://api.x.ai/v1/images/generations" oninput="saveConfigToLocal()">
+                    </div>
+                    <div class="input-row">
+                        <div class="config-group" style="flex: 1;">
+                            <label>✦ 图像模型代号 (Model ID)</label>
+                            <input type="text" id="api-image-model" placeholder="如: dall-e-3 / flux / midjourney" oninput="saveConfigToLocal()">
+                        </div>
+                        <div class="config-group" style="flex: 2;">
+                            <label>✦ 专属验证密钥 (为空则复用主模型 Key)</label>
+                            <input type="password" id="api-image-key" placeholder="在此填入独立 Key" oninput="saveConfigToLocal()">
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    <h2>Canvas & Export Parameters</h2>
+                    <div class="input-row" style="margin-top:5px;">
+                        <div class="config-group" style="flex: 1;">
+                            <label>✦ 画面比例 (Aspect Ratio)</label>
+                            <select id="image-aspect-ratio" onchange="syncImageManifest()">
+                                <option value="1:1">1:1 正方形 (头像/产品)</option>
+                                <option value="16:9">16:9 宽屏 (壁纸/海报)</option>
+                                <option value="9:16">9:16 竖屏 (手机海报)</option>
+                                <option value="4:3">4:3 传统相片</option>
+                                <option value="3:4">3:4 竖版相片</option>
+                            </select>
+                        </div>
+                        <div class="config-group" style="flex: 1;">
+                            <label>✦ 输出格式 (Output Format)</label>
+                            <select id="image-format" onchange="syncImageManifest()">
+                                <option value="PNG">PNG (无损画质)</option>
+                                <option value="JPG">JPG (标准压缩)</option>
+                                <option value="WEBP">WEBP (极速加载)</option>
+                                <option value="GIF">GIF (循环动图生成)</option>
+                            </select>
+                        </div>
+                        <div class="config-group" style="flex: 1;">
+                            <label>✦ 分辨率/画质 (Resolution)</label>
+                            <select id="image-quality" onchange="syncImageManifest()">
+                                <option value="standard">Standard (标准生成)</option>
+                                <option value="hd">HD (高精度细节)</option>
+                                <option value="1024x1024">1024x1024 (通用方形)</option>
+                                <option value="4k">4K (旗舰级生图)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="box-container" id="imageQueryContainer">
+                    <div class="box-header">
+                        <span class="box-title" style="color:var(--secondary);">IMAGE_PROMPT (视觉生图提示词)</span>
+                        <div class="controls">
+                            <button class="control-btn" onclick="clearBox('imageQueryArea', 'image');" title="清空">✕</button>
+                        </div>
+                    </div>
+                    
+                    <div class="fancy-upload-bar">
+                        <input type="file" id="imageMediaUpload" accept="image/*" multiple style="display: none;" onchange="handleAssetSelect(event, 'image')">
+                        <div class="btn-fancy-upload" onclick="document.getElementById('imageMediaUpload').click()" title="支持导入参考垫图 (Image-to-Image)">
+                            <span style="font-size:14px;">📎</span> 载入参考图垫图 (I2I)
+                        </div>
+                        <div style="font-size:11px; color:#94a3b8; margin-left:5px;" class="desktop-only">💡 提示: 载入后在文本中打 <b style="color:var(--secondary)">@</b> 即可关联垫图！</div>
+                    </div>
+                    <div class="asset-pills-pool" id="image-assets-pool"></div>
+
+                    <div class="textarea-wrapper">
+                        <textarea id="imageQueryArea" oninput="syncImageManifest()" placeholder="用文字详细描绘你想要的画面。如需图生图，输入 @ 绑定上方的垫图..."></textarea>
+                        <div id="imageMentionMenu" class="mention-menu"></div>
+                    </div>
+
+                    <div class="multimodal-manifest">
+                        <div class="manifest-title">⚡ IMAGE CONTEXT (图像生成矩阵当前输入清单)</div>
+                        <div class="manifest-grid" id="image-manifest-grid"></div>
+                    </div>
+                </div>
+                <button class="btn-run" style="background: linear-gradient(90deg, #3b82f6, #06b6d4);" onclick="executeImageGeneration()">渲染并导出图像 / GENERATE IMAGE</button>
+                
+                <div class="box-container">
+                    <div class="box-header">
+                        <span class="box-title" style="color:var(--secondary);">IMAGE_OUTPUT (图像输出查看器)</span>
+                        <div class="controls">
+                            <button class="control-btn" onclick="exportImage()" title="一键保存生成的图片/动图">💾</button>
+                        </div>
+                    </div>
+                    <div class="output-area" id="image-output-area" style="display: flex; align-items: center; justify-content: center;"><div class="msg-sys">生图引擎已就绪。生成的视觉图元将在此处挂载渲染。</div></div>
+                    <button class="btn-mobile-export" onclick="exportImage()">⇘ 一键导出图像/动图文件</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -441,16 +535,17 @@
                     第1行 👉 主模型端点 URL<br>
                     第2行 👉 主模型名称 (Model ID)<br>
                     第3行 👉 视频矩阵端点 URL<br>
-                    第4行及之后 👉 自动扩容并注入辅助参考节点
+                    第4行 👉 图像矩阵端点 URL 🚀<br>
+                    第5行及之后 👉 自动扩容并注入辅助参考节点
                 </div>
-                <textarea id="importArea" style="height: 160px; border-color: rgba(0,240,255,0.3); background: rgba(0,0,0,0.6);" placeholder="https://api.openai.com/v1/chat/completions\ngpt-4o\nhttps://api.x.ai/v1/images/generations\nhttps://api.data1.com/api/v1/..."></textarea>
+                <textarea id="importArea" style="height: 160px; border-color: rgba(0,240,255,0.3); background: rgba(0,0,0,0.6);" placeholder="https://api.openai.com/v1/chat/completions\ngpt-4o\nhttps://api.x.ai/v1/videos/generations\nhttps://api.x.ai/v1/images/generations\nhttps://api.data1.com/api/v1/..."></textarea>
                 <button class="btn-run" style="background: linear-gradient(90deg, #00f0ff, var(--secondary)); margin-top: 5px;" onclick="executeImport()">解析并极速注入 / PARSE & INJECT</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 🚀 确保核心 DOM 变量全局可用
+        // DOM 变量
         const outputArea = document.getElementById('output-area');
         const logContent = document.getElementById('logContent');
         const logPanel = document.getElementById('logPanel');
@@ -460,27 +555,41 @@
         let currentSessionId = null; let chatHistory = [];
         
         let currentGeneratedMediaUrl = null; 
+        let currentGeneratedImageUrl = null; // 🚀 图像矩阵专属导出变量
 
-        let assetsMap = { quant: [], video: [] };
+        // 🚀 资产池扩充：新增 image 工作区
+        let assetsMap = { quant: [], video: [], image: [] };
         let mentionStates = {
             quant: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'queryArea', menuId: 'quantMentionMenu' },
-            video: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'videoQueryArea', menuId: 'videoMentionMenu' }
+            video: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'videoQueryArea', menuId: 'videoMentionMenu' },
+            image: { active: false, query: '', startIndex: -1, selectedIndex: 0, filtered: [], areaId: 'imageQueryArea', menuId: 'imageMentionMenu' }
         };
 
         window.onload = () => {
             document.getElementById('api-main-url').value = localStorage.getItem('geek_api_url') || '';
             document.getElementById('api-main-model').value = localStorage.getItem('geek_api_model') || '';
             document.getElementById('api-main-key').value = localStorage.getItem('geek_api_key') || '';
+            
             document.getElementById('api-video-url').value = localStorage.getItem('geek_video_url') || '';
             document.getElementById('api-video-model').value = localStorage.getItem('geek_video_model') || '';
             document.getElementById('api-video-key').value = localStorage.getItem('geek_video_key') || '';
+            
+            // 🚀 图像矩阵初始读取
+            document.getElementById('api-image-url').value = localStorage.getItem('geek_image_url') || '';
+            document.getElementById('api-image-model').value = localStorage.getItem('geek_image_model') || '';
+            document.getElementById('api-image-key').value = localStorage.getItem('geek_image_key') || '';
+
             if(localStorage.getItem('geek_video_aspect')) document.getElementById('video-aspect-ratio').value = localStorage.getItem('geek_video_aspect');
             if(localStorage.getItem('geek_video_duration')) document.getElementById('video-duration').value = localStorage.getItem('geek_video_duration');
             if(localStorage.getItem('geek_video_resolution')) document.getElementById('video-quality').value = localStorage.getItem('geek_video_resolution');
             
+            if(localStorage.getItem('geek_image_aspect')) document.getElementById('image-aspect-ratio').value = localStorage.getItem('geek_image_aspect');
+            if(localStorage.getItem('geek_image_format')) document.getElementById('image-format').value = localStorage.getItem('geek_image_format');
+            if(localStorage.getItem('geek_image_resolution')) document.getElementById('image-quality').value = localStorage.getItem('geek_image_resolution');
+            
             renderGems(); 
-            renderAssetsPool('quant'); renderAssetsPool('video');
-            initMentionSystem('quant'); initMentionSystem('video');
+            renderAssetsPool('quant'); renderAssetsPool('video'); renderAssetsPool('image');
+            initMentionSystem('quant'); initMentionSystem('video'); initMentionSystem('image');
 
             const sessionIds = Object.keys(sessions);
             if (sessionIds.length > 0) { 
@@ -494,12 +603,20 @@
             localStorage.setItem('geek_api_url', document.getElementById('api-main-url').value.trim());
             localStorage.setItem('geek_api_model', document.getElementById('api-main-model').value.trim());
             localStorage.setItem('geek_api_key', document.getElementById('api-main-key').value.trim());
+            
             localStorage.setItem('geek_video_url', document.getElementById('api-video-url').value.trim());
             localStorage.setItem('geek_video_model', document.getElementById('api-video-model').value.trim());
             localStorage.setItem('geek_video_key', document.getElementById('api-video-key').value.trim());
             localStorage.setItem('geek_video_aspect', document.getElementById('video-aspect-ratio').value);
             localStorage.setItem('geek_video_duration', document.getElementById('video-duration').value);
             localStorage.setItem('geek_video_resolution', document.getElementById('video-quality').value);
+
+            localStorage.setItem('geek_image_url', document.getElementById('api-image-url').value.trim());
+            localStorage.setItem('geek_image_model', document.getElementById('api-image-model').value.trim());
+            localStorage.setItem('geek_image_key', document.getElementById('api-image-key').value.trim());
+            localStorage.setItem('geek_image_aspect', document.getElementById('image-aspect-ratio').value);
+            localStorage.setItem('geek_image_format', document.getElementById('image-format').value);
+            localStorage.setItem('geek_image_resolution', document.getElementById('image-quality').value);
         }
 
         function switchWorkspace(targetId, tabElement) {
@@ -507,7 +624,7 @@
             document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
             document.getElementById(targetId).classList.add('active');
             if(tabElement) tabElement.classList.add('active');
-            appendSysLog(`无缝切流至: ${targetId === 'quant-workspace' ? '量化扫描终端' : '视频创作矩阵'}`);
+            appendSysLog(`无缝切流至: ${targetId}`);
         }
 
         function toggleLog() { logPanel.classList.toggle('show'); }
@@ -520,26 +637,24 @@
         function openImportModal() { document.getElementById('importModal').classList.add('show'); }
         function closeImportModal() { document.getElementById('importModal').classList.remove('show'); document.getElementById('importArea').value = ''; }
         
+        // 🚀 API 解析适配第 4 行
         function executeImport() {
             const importText = document.getElementById('importArea').value;
             const lines = importText.split('\n').map(l => l.trim()).filter(l => l !== '');
-            if (lines.length === 0) {
-                alert("未检测到任何有效内容！");
-                return;
-            }
+            if (lines.length === 0) { alert("未检测到任何有效内容！"); return; }
 
             if (lines[0]) document.getElementById('api-main-url').value = lines[0];
             if (lines[1]) document.getElementById('api-main-model').value = lines[1];
             if (lines[2]) document.getElementById('api-video-url').value = lines[2];
+            if (lines[3]) document.getElementById('api-image-url').value = lines[3]; // 图像端点
 
-            if (lines.length > 3) {
+            if (lines.length > 4) {
                 const wrapper = document.getElementById('dynamic-nodes-wrapper');
                 wrapper.innerHTML = ''; 
-                
                 const existingRefInputs = document.querySelectorAll('.container .ref-api-input'); 
                 
-                for (let i = 3; i < lines.length; i++) {
-                    const nodeIndex = i - 3;
+                for (let i = 4; i < lines.length; i++) {
+                    const nodeIndex = i - 4;
                     if (nodeIndex < 2) {
                         existingRefInputs[nodeIndex].value = lines[i];
                     } else {
@@ -556,66 +671,37 @@
         }
 
         function exportReport() {
-            if (!outputArea || !outputArea.innerHTML.trim()) {
-                alert("当前没有可导出的分析报告内容！");
-                return;
-            }
+            if (!outputArea || !outputArea.innerHTML.trim()) { alert("当前没有可导出的分析报告内容！"); return; }
             const reportContent = outputArea.innerHTML;
             const exportTemplate = `
-            <!DOCTYPE html>
-            <html lang="zh-CN">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Universal Quant 策略分析报告</title>
-                <style>
-                    body { background-color: #020617; color: #e2e8f0; font-family: 'Consolas', 'PingFang SC', sans-serif; padding: 30px; line-height: 1.7; }
-                    .msg-user { color: #f59e0b; font-weight: bold; margin-top: 25px; border-left: 4px solid #f59e0b; padding-left: 15px; margin-bottom: 15px; }
-                    .msg-ai { background: rgba(15, 23, 42, 0.8); padding: 20px; border-radius: 8px; border-left: 4px solid #00f0ff; margin-bottom: 20px; white-space: pre-wrap; font-size: 15px; }
-                    .msg-error { color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; }
-                    img { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #00f0ff; display: block; }
-                    h1 { color: #00f0ff; text-align: center; border-bottom: 1px solid rgba(0,240,255,0.3); padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
-                    .footer { text-align: center; font-size: 12px; color: #64748b; margin-top: 40px; border-top: 1px dashed #333; padding-top: 15px; }
-                </style>
-            </head>
-            <body>
-                <h1>Universal Quant 自动化分析报告</h1>
-                <div class="report-content">${reportContent}</div>
-                <div class="footer">生成时间: ${new Date().toLocaleString()} (由 Universal Quant Terminal 联邦渲染)</div>
-            </body>
-            </html>`;
+            <!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Universal Quant 策略分析报告</title>
+            <style>body { background-color: #020617; color: #e2e8f0; font-family: 'Consolas', 'PingFang SC', sans-serif; padding: 30px; line-height: 1.7; } .msg-user { color: #f59e0b; font-weight: bold; margin-top: 25px; border-left: 4px solid #f59e0b; padding-left: 15px; margin-bottom: 15px; } .msg-ai { background: rgba(15, 23, 42, 0.8); padding: 20px; border-radius: 8px; border-left: 4px solid #00f0ff; margin-bottom: 20px; white-space: pre-wrap; font-size: 15px; } img { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #00f0ff; display: block; } h1 { color: #00f0ff; text-align: center; border-bottom: 1px solid rgba(0,240,255,0.3); padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; } .footer { text-align: center; font-size: 12px; color: #64748b; margin-top: 40px; border-top: 1px dashed #333; padding-top: 15px; }</style>
+            </head><body><h1>Universal Quant 自动化分析报告</h1><div class="report-content">${reportContent}</div><div class="footer">生成时间: ${new Date().toLocaleString()}</div></body></html>`;
             const blob = new Blob([exportTemplate], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Quant_Report_${new Date().getTime()}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const a = document.createElement('a'); a.href = url; a.download = `Quant_Report_${new Date().getTime()}.html`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
             appendSysLog('✔ 分析报告已成功打包！请在弹出的窗口中选择文件夹保存。');
         }
 
         function exportVideo() {
-            if (!currentGeneratedMediaUrl) {
-                alert("当前播放区没有检测到任何生成的视频或媒体资产！");
-                return;
-            }
-            const a = document.createElement('a');
-            a.href = currentGeneratedMediaUrl;
-            a.target = '_blank';
-            let ext = "mp4";
-            if (currentGeneratedMediaUrl.includes(".png") || currentGeneratedMediaUrl.includes("image") || currentGeneratedMediaUrl.startsWith("data:image")) ext = "png";
-            a.download = `Quant_Media_Output_${new Date().getTime()}.${ext}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            appendSysLog('✔ 媒体文件下载指令已触发！如果未自动弹出保存窗口，可在打开的新标签页中右键选择另存为。');
+            if (!currentGeneratedMediaUrl) { alert("当前播放区没有检测到任何媒体资产！"); return; }
+            const a = document.createElement('a'); a.href = currentGeneratedMediaUrl; a.target = '_blank';
+            let ext = "mp4"; if (currentGeneratedMediaUrl.includes(".png") || currentGeneratedMediaUrl.includes("image")) ext = "png";
+            a.download = `Quant_Media_Output_${new Date().getTime()}.${ext}`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        // 🚀 新增：图像导出函数
+        function exportImage() {
+            if (!currentGeneratedImageUrl) { alert("当前渲染区没有检测到任何图像资产！"); return; }
+            const a = document.createElement('a'); a.href = currentGeneratedImageUrl; a.target = '_blank';
+            let ext = document.getElementById('image-format').value.toLowerCase() || "png";
+            a.download = `Quant_Image_Output_${new Date().getTime()}.${ext}`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         async function handleAssetSelect(e, scope) {
             const files = e.target.files; if (!files || files.length === 0) return;
-            appendSysLog(`[${scope}] 正在导入 ${files.length} 个多模态联邦资产...`);
+            appendSysLog(`[${scope}] 正在导入 ${files.length} 个联邦资产...`);
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]; const fileType = file.type.split('/')[0];
@@ -624,54 +710,38 @@
                     reader.onload = async (ev) => {
                         let base64Data = ev.target.result; let previewSrc = base64Data;
                         if (fileType === 'video') { try { previewSrc = await extractVideoFrame(file); } catch(err) { previewSrc = ''; } }
-                        
                         const typeCount = assetsMap[scope].filter(a => a.type === fileType).length + 1;
-                        const generatedAlias = `${fileType}_${typeCount}`;
-
-                        assetsMap[scope].push({
-                            id: 'asset_' + Date.now() + '_' + i,
-                            fileName: file.name,
-                            type: fileType,
-                            base64: base64Data,
-                            preview: previewSrc,
-                            handle: generatedAlias
-                        });
+                        assetsMap[scope].push({ id: 'asset_' + Date.now() + '_' + i, fileName: file.name, type: fileType, base64: base64Data, preview: previewSrc, handle: `${fileType}_${typeCount}` });
                         resolve();
                     };
                     reader.readAsDataURL(file);
                 });
             }
             renderAssetsPool(scope);
-            if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
+            if(scope === 'quant') syncQuantManifest(); else if(scope === 'video') syncVideoManifest(); else syncImageManifest();
             e.target.value = ''; 
         }
 
         function renderAssetsPool(scope) {
             const pool = document.getElementById(`${scope}-assets-pool`); pool.innerHTML = '';
-            if (assetsMap[scope].length === 0) {
-                pool.innerHTML = `<span style="font-size:12px; color:#64748b; font-style:italic;">暂无引入资产。点击上方按钮批量载入...</span>`; return;
-            }
+            if (assetsMap[scope].length === 0) { pool.innerHTML = `<span style="font-size:12px; color:#64748b; font-style:italic;">暂无引入资产。点击上方按钮批量载入...</span>`; return; }
             assetsMap[scope].forEach((asset, index) => {
                 const pill = document.createElement('div'); pill.className = 'asset-pill';
                 let icon = (asset.type === 'image' || asset.type === 'video') ? `<img src="${asset.preview || asset.base64}">` : `<span style="font-size:12px;">🎵</span>`;
-                pill.innerHTML = `
-                    <div class="asset-pill-icon">${icon}</div>
-                    <div class="asset-pill-name">
-                        <span>@</span>
-                        <input type="text" value="${asset.handle}" oninput="updateAssetHandleName('${scope}', ${index}, this.value)">
-                    </div>
-                    <button class="asset-pill-btn-del" onclick="removeAsset('${scope}', ${index})">✕</button>
-                `;
+                pill.innerHTML = `<div class="asset-pill-icon">${icon}</div><div class="asset-pill-name"><span>@</span><input type="text" value="${asset.handle}" oninput="updateAssetHandleName('${scope}', ${index}, this.value)"></div><button class="asset-pill-btn-del" onclick="removeAsset('${scope}', ${index})">✕</button>`;
                 pool.appendChild(pill);
             });
         }
 
         function updateAssetHandleName(scope, index, typedValue) {
             assetsMap[scope][index].handle = typedValue.replace(/[^a-zA-Z0-9_]/g, '');
-            if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
+            if(scope === 'quant') syncQuantManifest(); else if(scope === 'video') syncVideoManifest(); else syncImageManifest();
         }
 
-        function removeAsset(scope, index) { assetsMap[scope].splice(index, 1); renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
+        function removeAsset(scope, index) { 
+            assetsMap[scope].splice(index, 1); renderAssetsPool(scope); 
+            if(scope === 'quant') syncQuantManifest(); else if(scope === 'video') syncVideoManifest(); else syncImageManifest(); 
+        }
 
         function initMentionSystem(scope) {
             const state = mentionStates[scope];
@@ -679,10 +749,7 @@
             const menu = document.getElementById(state.menuId);
 
             area.addEventListener('input', function() {
-                const cursor = this.selectionStart;
-                const textToCursor = this.value.substring(0, cursor);
-                const match = textToCursor.match(/@([a-zA-Z0-9_]*)$/);
-                
+                const cursor = this.selectionStart; const textToCursor = this.value.substring(0, cursor); const match = textToCursor.match(/@([a-zA-Z0-9_]*)$/);
                 if (match && assetsMap[scope].length > 0) {
                     state.active = true; state.query = match[1].toLowerCase(); state.startIndex = match.index;
                     state.filtered = assetsMap[scope].filter(a => a.handle.toLowerCase().includes(state.query) || a.fileName.toLowerCase().includes(state.query));
@@ -722,27 +789,19 @@
             const injected = `@${handleName} `; area.value = before + injected + after;
             area.focus(); area.selectionStart = area.selectionEnd = before.length + injected.length;
             mentionStates[scope].active = false; document.getElementById(state.menuId).classList.remove('show');
-            if(scope === 'quant') syncQuantManifest(); else syncVideoManifest();
+            if(scope === 'quant') syncQuantManifest(); else if(scope === 'video') syncVideoManifest(); else syncImageManifest();
         }
 
         function syncQuantManifest() {
-            saveConfigToLocal(); 
-            const query = document.getElementById('queryArea').value;
-            
-            if (currentSessionId && sessions[currentSessionId]) {
-                sessions[currentSessionId].queryText = query;
-                saveToLocal();
-                renderSidebar(); 
-            }
-
+            saveConfigToLocal(); const query = document.getElementById('queryArea').value;
+            if (currentSessionId && sessions[currentSessionId]) { sessions[currentSessionId].queryText = query; saveToLocal(); renderSidebar(); }
             const grid = document.getElementById('quant-manifest-grid'); 
-            grid.innerHTML = `<div class="manifest-card"><span><i class="manifest-icon">📝</i>规约指令:</span><p>${query || '(空白策略)'}</p></div>`;
+            grid.innerHTML = `<div class="manifest-card"><span><i class="manifest-icon">📝</i>规约指令:</span><p>${query || '(空白)'}</p></div>`;
             assetsMap.quant.forEach(asset => {
                 if (query.includes(`@${asset.handle}`)) {
                     let thumb = (asset.type === 'image' || asset.type === 'video') ? `<img class="manifest-thumb" src="${asset.preview || asset.base64}">` : '';
                     const card = document.createElement('div'); card.className = 'manifest-card';
-                    card.innerHTML = `${thumb}<span><i class="manifest-icon">📊</i>数据载荷:</span><p>@${asset.handle}</p>`;
-                    grid.appendChild(card);
+                    card.innerHTML = `${thumb}<span><i class="manifest-icon">📊</i>数据载荷:</span><p>@${asset.handle}</p>`; grid.appendChild(card);
                 }
             });
         }
@@ -750,18 +809,26 @@
         function syncVideoManifest() {
             saveConfigToLocal(); const prompt = document.getElementById('videoQueryArea').value.trim();
             const grid = document.getElementById('video-manifest-grid');
-            grid.innerHTML = `
-                <div class="manifest-card"><span><i class="manifest-icon">📝</i>文字剧本:</span><p>${prompt || '(未填写)'}</p></div>
-                <div class="manifest-card"><span><i class="manifest-icon">📐</i>画面比例:</span><p>${document.getElementById('video-aspect-ratio').value}</p></div>
-                <div class="manifest-card"><span><i class="manifest-icon">⏱️</i>视频时长:</span><p>${document.getElementById('video-duration').value}秒</p></div>
-                <div class="manifest-card"><span><i class="manifest-icon">💎</i>输出画质:</span><p>${document.getElementById('video-quality').value}</p></div>
-            `;
+            grid.innerHTML = `<div class="manifest-card"><span><i class="manifest-icon">📝</i>文字剧本:</span><p>${prompt || '(未填写)'}</p></div><div class="manifest-card"><span><i class="manifest-icon">📐</i>画面比例:</span><p>${document.getElementById('video-aspect-ratio').value}</p></div><div class="manifest-card"><span><i class="manifest-icon">⏱️</i>视频时长:</span><p>${document.getElementById('video-duration').value}秒</p></div><div class="manifest-card"><span><i class="manifest-icon">💎</i>输出画质:</span><p>${document.getElementById('video-quality').value}</p></div>`;
             assetsMap.video.forEach(asset => {
                 if (prompt.includes(`@${asset.handle}`)) {
                     let thumb = (asset.type === 'image' || asset.type === 'video') ? `<img class="manifest-thumb" src="${asset.preview || asset.base64}">` : '';
                     const card = document.createElement('div'); card.className = 'manifest-card';
-                    card.innerHTML = `${thumb}<span><i class="manifest-icon">🎨</i>联邦素材:</span><p>@${asset.handle}</p>`;
-                    grid.appendChild(card);
+                    card.innerHTML = `${thumb}<span><i class="manifest-icon">🎨</i>联邦素材:</span><p>@${asset.handle}</p>`; grid.appendChild(card);
+                }
+            });
+        }
+
+        // 🚀 新增：同步图像生图矩阵清单
+        function syncImageManifest() {
+            saveConfigToLocal(); const prompt = document.getElementById('imageQueryArea').value.trim();
+            const grid = document.getElementById('image-manifest-grid');
+            grid.innerHTML = `<div class="manifest-card"><span><i class="manifest-icon">📝</i>画面描述:</span><p>${prompt || '(未填写)'}</p></div><div class="manifest-card"><span><i class="manifest-icon">📐</i>画面比例:</span><p>${document.getElementById('image-aspect-ratio').value}</p></div><div class="manifest-card"><span><i class="manifest-icon">🎞️</i>输出格式:</span><p>${document.getElementById('image-format').value}</p></div><div class="manifest-card"><span><i class="manifest-icon">💎</i>输出画质:</span><p>${document.getElementById('image-quality').value}</p></div>`;
+            assetsMap.image.forEach(asset => {
+                if (prompt.includes(`@${asset.handle}`)) {
+                    let thumb = (asset.type === 'image' || asset.type === 'video') ? `<img class="manifest-thumb" src="${asset.preview || asset.base64}">` : '';
+                    const card = document.createElement('div'); card.className = 'manifest-card';
+                    card.innerHTML = `${thumb}<span><i class="manifest-icon">🖼️</i>参考垫图:</span><p>@${asset.handle}</p>`; grid.appendChild(card);
                 }
             });
         }
@@ -785,102 +852,48 @@
             const box = document.getElementById('gems-list'); box.innerHTML = '';
             gems.forEach((g, i) => {
                 const d = document.createElement('div'); d.className = 'gem-item';
-                d.innerHTML = `
-                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:8px;" onclick="applyGem(${i})">
-                        <span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span> 
-                        <span style="font-weight:bold;">${g.name}</span>
-                    </div>
-                    <button class="btn-del-session" onclick="deleteGem(event, ${i})">✕</button>
-                `;
+                d.innerHTML = `<div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:8px;" onclick="applyGem(${i})"><span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span><span style="font-weight:bold;">${g.name}</span></div><button class="btn-del-session" onclick="deleteGem(event, ${i})">✕</button>`;
                 box.appendChild(d);
             });
         }
         
         function applyGem(i) { 
-            const gemObj = gems[i];
-            document.getElementById('runGemTitle').innerHTML = `<span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span> 策略预设：${gemObj.name}`;
-            document.getElementById('gemRunArea').value = gemObj.prompt;
-            document.getElementById('gemRunModal').classList.add('show');
-            appendSysLog(`装载预设 Gem [${gemObj.name}] 至执行沙盒，等待指令...`); 
+            const gemObj = gems[i]; document.getElementById('runGemTitle').innerHTML = `<span style="font-size:16px; filter:drop-shadow(0 0 5px var(--primary));">💎</span> 策略预设：${gemObj.name}`;
+            document.getElementById('gemRunArea').value = gemObj.prompt; document.getElementById('gemRunModal').classList.add('show'); appendSysLog(`装载预设 [${gemObj.name}]...`); 
         }
 
-        function closeGemRunModal() {
-            document.getElementById('gemRunModal').classList.remove('show');
-        }
-
+        function closeGemRunModal() { document.getElementById('gemRunModal').classList.remove('show'); }
         function executeGemCommand() {
-            const gemText = document.getElementById('gemRunArea').value.trim();
-            if(!gemText) return;
-            switchWorkspace('quant-workspace', document.querySelector('.nav-tab'));
-            document.getElementById('queryArea').value = gemText;
-            syncQuantManifest(); 
-            closeGemRunModal();
-            appendSysLog(`已从策略沙盒触发全局投递...`); 
-            
-            // 🚀 修复调用主命令函数
-            executeCommand();
+            const gemText = document.getElementById('gemRunArea').value.trim(); if(!gemText) return;
+            switchWorkspace('quant-workspace', document.querySelector('.nav-tab')); document.getElementById('queryArea').value = gemText;
+            syncQuantManifest(); closeGemRunModal(); executeCommand();
         }
-
         function deleteGem(e, i) { e.stopPropagation(); gems.splice(i, 1); localStorage.setItem('geek_gems', JSON.stringify(gems)); renderGems(); }
 
         function renderSidebar() {
-            const sessionListEl = document.getElementById('session-list');
-            sessionListEl.innerHTML = ''; 
-            const ids = Object.keys(sessions).reverse();
-            
+            const sessionListEl = document.getElementById('session-list'); sessionListEl.innerHTML = ''; const ids = Object.keys(sessions).reverse();
             ids.forEach(id => {
-                const isActive = (id === currentSessionId);
-                const item = document.createElement('div'); 
-                item.className = `session-item ${isActive ? 'active' : ''}`; 
-                item.onclick = () => loadSession(id);
-                
+                const isActive = (id === currentSessionId); const item = document.createElement('div'); item.className = `session-item ${isActive ? 'active' : ''}`; item.onclick = () => loadSession(id);
                 let previewText = sessions[id].queryText || "";
-                
-                item.innerHTML = `
-                    <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
-                        <div style="font-size:13px; font-weight:bold; color:${isActive ? '#fff' : '#cbd5e1'};">✦ ${sessions[id].title || '策略层'}</div>
-                        <div class="session-preview-box">${previewText || '（空白策略，点击输入...）'}</div>
-                    </div>
-                    <button class="btn-del-session" onclick="deleteSession(event, '${id}')">✕</button>
-                `;
+                item.innerHTML = `<div style="flex:1; min-width:0; display:flex; flex-direction:column;"><div style="font-size:13px; font-weight:bold; color:${isActive ? '#fff' : '#cbd5e1'};">✦ ${sessions[id].title || '策略层'}</div><div class="session-preview-box">${previewText || '（空白策略，点击输入...）'}</div></div><button class="btn-del-session" onclick="deleteSession(event, '${id}')">✕</button>`;
                 sessionListEl.appendChild(item);
             });
         }
         
         function createNewSession() { 
-            // 🚀 确保安全执行
             if (currentSessionId && sessions[currentSessionId]) {
                 const cur = sessions[currentSessionId];
                 if (cur.history && cur.history.length === 0 && (!cur.queryText || cur.queryText.trim() === '')) {
-                    document.getElementById('queryArea').value = '';
-                    syncQuantManifest();
-                    if(outputArea) outputArea.innerHTML = '';
-                    return;
+                    document.getElementById('queryArea').value = ''; syncQuantManifest(); if(outputArea) outputArea.innerHTML = ''; return;
                 }
             }
-
-            currentSessionId = 'session_' + Date.now(); 
-            chatHistory = []; 
-            sessions[currentSessionId] = { title: "新策略层", history: [], queryText: "" }; 
-            
-            document.getElementById('queryArea').value = '';
-            syncQuantManifest();
-            
-            saveToLocal(); 
-            renderSidebar(); 
-            if(outputArea) outputArea.innerHTML = ''; 
+            currentSessionId = 'session_' + Date.now(); chatHistory = []; sessions[currentSessionId] = { title: "新策略层", history: [], queryText: "" }; 
+            document.getElementById('queryArea').value = ''; syncQuantManifest(); saveToLocal(); renderSidebar(); if(outputArea) outputArea.innerHTML = ''; 
         }
         
         loadSession = function(id) {
-            currentSessionId = id; 
-            chatHistory = sessions[id].history || []; 
-            
-            document.getElementById('queryArea').value = sessions[id].queryText || '';
-            syncQuantManifest();
-
-            renderSidebar(); 
-            if(outputArea) outputArea.innerHTML = '';
-            
+            currentSessionId = id; chatHistory = sessions[id].history || []; 
+            document.getElementById('queryArea').value = sessions[id].queryText || ''; syncQuantManifest(); renderSidebar(); if(outputArea) outputArea.innerHTML = '';
             chatHistory.forEach(m => {
                 let txt = typeof m.content === 'string' ? m.content : m.content.find(t=>t.type==='text')?.text || '';
                 if(txt.includes('用户动态条件：\n')) txt = txt.split('用户动态条件：\n')[1].split('\n\n【辅助节点】')[0];
@@ -889,19 +902,9 @@
         }
         
         function deleteSession(e, id) { 
-            e.stopPropagation(); 
-            delete sessions[id]; 
-            saveToLocal(); 
-            
-            if (Object.keys(sessions).length === 0) {
-                createNewSession();
-            } else {
-                if (id === currentSessionId) {
-                    const remainingIds = Object.keys(sessions).reverse();
-                    loadSession(remainingIds[0]);
-                } else {
-                    renderSidebar();
-                }
+            e.stopPropagation(); delete sessions[id]; saveToLocal(); 
+            if (Object.keys(sessions).length === 0) { createNewSession(); } else {
+                if (id === currentSessionId) { const remainingIds = Object.keys(sessions).reverse(); loadSession(remainingIds[0]); } else { renderSidebar(); }
             }
         }
         function saveToLocal() { localStorage.setItem('geek_sessions', JSON.stringify(sessions)); }
@@ -912,95 +915,51 @@
             w.appendChild(g);
         }
         function removeNode(b) { b.closest('.dynamic-node').remove(); }
-        function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else syncVideoManifest(); }
+        function clearBox(id, scope) { document.getElementById(id).value = ""; assetsMap[scope] = []; renderAssetsPool(scope); if(scope === 'quant') syncQuantManifest(); else if(scope === 'video') syncVideoManifest(); else syncImageManifest(); }
         function toggleFullscreen(id) { document.getElementById(id).classList.toggle('fullscreen'); }
 
-        // 🚀 核心修复：执行扫描策略的逻辑，解开了强制纯文本限制，并且直接在屏幕输出 Markdown 图片
         async function executeCommand() {
             let query = document.getElementById('queryArea').value.trim();
-            const apiUrl = document.getElementById('api-main-url').value.trim();
-            const apiModel = document.getElementById('api-main-model').value.trim();
-            const apiKey = document.getElementById('api-main-key').value.trim();
-            if (!query) return; 
-            saveConfigToLocal();
+            const apiUrl = document.getElementById('api-main-url').value.trim(); const apiModel = document.getElementById('api-main-model').value.trim(); const apiKey = document.getElementById('api-main-key').value.trim();
+            if (!query) return; saveConfigToLocal();
             
-            // 确保会话有效
-            if (!currentSessionId || !sessions[currentSessionId]) {
-                createNewSession();
-            }
+            if (!currentSessionId || !sessions[currentSessionId]) { createNewSession(); }
+            if (sessions[currentSessionId].title === "新策略层") { sessions[currentSessionId].title = query.substring(0, 12) + '...'; saveToLocal(); renderSidebar(); }
 
-            if (sessions[currentSessionId].title === "新策略层") {
-                sessions[currentSessionId].title = query.substring(0, 12) + '...';
-                saveToLocal();
-                renderSidebar();
-            }
-
-            if(outputArea) outputArea.innerHTML += `<div class="msg-user">用户提问: ${query}</div>`;
-            appendSysLog(`正在编译全量多模态联邦载荷发送给分析大脑...`);
+            if(outputArea) outputArea.innerHTML += `<div class="msg-user">用户提问: ${query}</div>`; appendSysLog(`正在编译多模态联邦载荷发送给大脑...`);
 
             try {
                 let boundImages = [];
                 assetsMap.quant.forEach(asset => {
                     const tag = `@${asset.handle}`;
-                    if (query.includes(tag)) {
-                        if (asset.type === 'image' || asset.type === 'video') {
-                            boundImages.push(asset.base64);
-                            query = query.replace(tag, `[联邦参考载荷: @${asset.handle}]`); 
-                        }
-                    }
+                    if (query.includes(tag)) { if (asset.type === 'image' || asset.type === 'video') { boundImages.push(asset.base64); query = query.replace(tag, `[联邦参考载荷: @${asset.handle}]`); } }
                 });
 
                 let combinedRawData = ""; const allNodes = document.querySelectorAll('.ref-api-input'); let dataSourceMeta = "全量数据源";
                 for (let i = 0; i < allNodes.length; i++) {
                     const nodeValue = allNodes[i].value.trim();
                     if (nodeValue && (nodeValue.startsWith('http://') || nodeValue.startsWith('https://'))) {
-                        dataSourceMeta = nodeValue.split('?')[0];
-                        const res = await fetch(`${nodeValue}${nodeValue.includes('?')?'&':'?'}_t=${Date.now()}`, { cache: 'no-store' });
+                        dataSourceMeta = nodeValue.split('?')[0]; const res = await fetch(`${nodeValue}${nodeValue.includes('?')?'&':'?'}_t=${Date.now()}`, { cache: 'no-store' });
                         if (res.ok) { const txt = await res.text(); combinedRawData += `【节点 ${i + 1}数据】:\n${txt.substring(0, 20000)}\n\n`; }
                     }
                 }
 
-                // 🚀 修复核心：解开了死板的限制。让大模型根据你的问题自由判断该回啥（比如遇到“给我画雪山”不再报错）
                 const finalPrompt = `【系统指令】：用户请求：\n${query}\n\n【附加数据源】：\n${combinedRawData}\n\n【任务要求】：请直接响应用户请求。如果是量化分析任务，请推演清洗排序；如果是画图或通用问答，请直接执行并返回结果。`;
-                
                 let messageContent = [{ type: "text", text: finalPrompt }];
-                boundImages.forEach(imgData => {
-                    messageContent.push({ type: "image_url", image_url: { url: imgData } });
-                });
-
+                boundImages.forEach(imgData => { messageContent.push({ type: "image_url", image_url: { url: imgData } }); });
                 chatHistory.push({ role: "user", content: messageContent });
                 
-                const response = await fetch(apiUrl, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, 
-                    body: JSON.stringify({ model: apiModel, messages: chatHistory }) 
-                });
-                
-                const resultJSON = await response.json(); 
-                let aiAnswer = resultJSON.choices[0].message.content;
+                const response = await fetch(apiUrl, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: apiModel, messages: chatHistory }) });
+                const resultJSON = await response.json(); let aiAnswer = resultJSON.choices[0].message.content;
 
-                // 🚀 核心修复2：如果大模型给你返回了 Markdown 格式的图片(比如：![雪山](http...))，这段代码能把它瞬间渲染出来！
                 aiAnswer = aiAnswer.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 15px rgba(0,240,255,0.2); margin: 10px 0;">');
 
-                chatHistory.push({ role: "assistant", content: aiAnswer }); 
-                sessions[currentSessionId].history = chatHistory; 
-                saveToLocal(); 
-                renderSidebar();
-                
+                chatHistory.push({ role: "assistant", content: aiAnswer }); sessions[currentSessionId].history = chatHistory; saveToLocal(); renderSidebar();
                 if(outputArea) outputArea.innerHTML += `<div class="msg-ai">${aiAnswer}</div>`;
-            } catch (error) { 
-                if(outputArea) outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; 
-            }
+            } catch (error) { if(outputArea) outputArea.innerHTML += `<div class="msg-error">[运算终止] ${error.message}</div>`; }
         }
 
-        function renderMedia(url, modelName) {
-            if (url.match(/\.(mp4|webm|mov)$/i) || modelName.toLowerCase().includes('video') || modelName.toLowerCase().includes('runway') || modelName.toLowerCase().includes('sora') || modelName.toLowerCase().includes('luma')) {
-                return `<video src="${url}" controls autoplay loop style="max-width:100%; max-height:280px; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 20px rgba(0,240,255,0.2);"></video>`;
-            } else {
-                return `<img src="${url}" style="max-width:100%; max-height:280px; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 20px rgba(0,240,255,0.2);">`;
-            }
-        }
-
+        // ================= 视频创作引擎 =================
         async function executeVideoGeneration() {
             let scriptPrompt = document.getElementById('videoQueryArea').value.trim();
             let videoUrl = document.getElementById('api-video-url').value.trim() || document.getElementById('api-main-url').value.trim();
@@ -1015,7 +974,7 @@
             if (!videoUrl || !videoModel || !videoKey) { alert("鉴权配置卡槽（Key/Url）缺失！"); return; }
 
             const vOutput = document.getElementById('video-output-area');
-            vOutput.innerHTML = `<div class="msg-sys" style="color:var(--primary);">>> [多模态联邦] 正在封装包含文案、图片、音轨的全量多模态载荷...</div>`;
+            vOutput.innerHTML = `<div class="msg-sys" style="color:var(--primary);">>> [多模态联邦] 正在封装视频生成全量载荷...</div>`;
             appendSysLog(`=== 视频矩阵全量输出启动 ===`);
 
             try {
@@ -1030,25 +989,18 @@
 
                 let payload = {};
                 if (videoUrl.toLowerCase().includes("image") || videoUrl.toLowerCase().includes("video") || videoUrl.toLowerCase().includes("generation")) {
-                    appendSysLog("路由匹配：专项图像/视频端点 API 协议。");
                     payload = { model: videoModel, prompt: scriptPrompt, aspect_ratio: aspectSetting, resolution: resolutionSetting };
                     if (boundImages.length > 0) payload.image_url = boundImages[0];
                     if (boundAudios.length > 0) payload.audio_url = boundAudios[0];
                     if (videoUrl.toLowerCase().includes("video") || videoModel.toLowerCase().includes("video")) payload.duration = durationSetting;
                 } else {
-                    appendSysLog("路由匹配：通用多模态消息协议。");
                     payload.model = videoModel;
                     let mContent = [{ type: "text", text: `【比例】:${aspectSetting} 【时长】:${durationSetting}s 【画质】:${resolutionSetting}\n【剧本】:\n${scriptPrompt}` }];
                     boundImages.forEach(img => mContent.push({ type: "image_url", image_url: { url: img } }));
                     payload.messages = [{ role: "user", content: mContent }];
                 }
 
-                const response = await fetch(videoUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${videoKey}` },
-                    body: JSON.stringify(payload)
-                });
-
+                const response = await fetch(videoUrl, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${videoKey}` }, body: JSON.stringify(payload) });
                 if (!response.ok) { const errText = await response.text(); throw new Error(`网关异常 状态码: ${response.status} - ${errText.substring(0, 120)}`); }
                 const result = await response.json();
                 
@@ -1082,6 +1034,77 @@
                     }, 5000);
                 } else {
                     vOutput.innerHTML = `<pre style="background:#000; padding:10px; border-radius:6px; color:#10b981; max-height:200px; overflow:auto;">${JSON.stringify(result, null, 2)}</pre>`;
+                }
+            } catch (e) { vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${e.message}</div>`; }
+        }
+
+        // ================= 🚀 新增：图像生图引擎 =================
+        async function executeImageGeneration() {
+            let scriptPrompt = document.getElementById('imageQueryArea').value.trim();
+            let imageUrl = document.getElementById('api-image-url').value.trim() || document.getElementById('api-main-url').value.trim();
+            let imageModel = document.getElementById('api-image-model').value.trim() || document.getElementById('api-main-model').value.trim();
+            let imageKey = document.getElementById('api-image-key').value.trim() || document.getElementById('api-main-key').value.trim();
+            
+            let aspectSetting = document.getElementById('image-aspect-ratio').value;
+            let formatSetting = document.getElementById('image-format').value;
+            let qualitySetting = document.getElementById('image-quality').value;
+
+            if (!scriptPrompt && assetsMap.image.length === 0) { alert("图像生成提示词不能为空！"); return; }
+            if (!imageUrl || !imageModel || !imageKey) { alert("图像矩阵鉴权配置缺失！"); return; }
+
+            const vOutput = document.getElementById('image-output-area');
+            vOutput.innerHTML = `<div class="msg-sys" style="color:var(--primary);">>> [生图路由] 正在向图像渲染端点发起请求...格式: ${formatSetting}</div>`;
+            appendSysLog(`=== 图像矩阵生成启动 | 格式: ${formatSetting} ===`);
+
+            try {
+                let boundImages = [];
+                assetsMap.image.forEach(asset => {
+                    const handleTag = `@${asset.handle}`;
+                    if (scriptPrompt.includes(handleTag)) {
+                        if (asset.type === 'image' || asset.type === 'video') { boundImages.push(asset.base64); } 
+                    }
+                });
+
+                let payload = {};
+                // 自适应标准 DALL-E / xAI 生图接口
+                if (imageUrl.toLowerCase().includes("image") || imageUrl.toLowerCase().includes("generation") || imageModel.toLowerCase().includes("dall")) {
+                    payload = { model: imageModel, prompt: scriptPrompt };
+                    
+                    // 兼容常规尺寸与特殊参数
+                    if(qualitySetting === '1024x1024') { payload.size = "1024x1024"; } 
+                    else { payload.aspect_ratio = aspectSetting; payload.quality = qualitySetting; }
+                    
+                    // 特殊透传动图/格式参数
+                    payload.output_format = formatSetting.toLowerCase();
+                    if(formatSetting === 'GIF') { payload.is_gif = true; scriptPrompt += " (Generate as an animated GIF loop)"; payload.prompt = scriptPrompt; }
+
+                    if (boundImages.length > 0) { payload.image_url = boundImages[0]; payload.image = boundImages[0]; } // 兼容不同API垫图卡槽
+                } else {
+                    // 如果用的是通用大模型，强制让它返回 Markdown 格式图
+                    payload.model = imageModel;
+                    let mContent = [{ type: "text", text: `[SYSTEM: Generate an image. Format: ${formatSetting}. Aspect: ${aspectSetting}]\n\nUser Request: ${scriptPrompt}` }];
+                    boundImages.forEach(img => mContent.push({ type: "image_url", image_url: { url: img } }));
+                    payload.messages = [{ role: "user", content: mContent }];
+                }
+
+                const response = await fetch(imageUrl, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${imageKey}` }, body: JSON.stringify(payload) });
+                if (!response.ok) { const errText = await response.text(); throw new Error(`渲染网关阻断: ${response.status} - ${errText.substring(0, 100)}`); }
+                
+                const result = await response.json();
+                
+                // 深度解析常见的图像 URL 嵌套结构
+                let parsedImageUrl = result.image_url || result.url || (result.data && result.data[0]?.url) || (result.images && result.images[0]?.url) || "";
+                
+                if (!parsedImageUrl && result.choices && result.choices[0]?.message?.content) {
+                    let content = result.choices[0].message.content; let urlMatch = content.match(/https?:\/\/[^\s"')]+/); 
+                    if (urlMatch) parsedImageUrl = urlMatch[0];
+                }
+
+                if (parsedImageUrl) {
+                    currentGeneratedImageUrl = parsedImageUrl; 
+                    vOutput.innerHTML = `<div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;"><img src="${parsedImageUrl}" style="max-width:100%; max-height:350px; border-radius:8px; border:1px solid var(--primary); box-shadow:0 0 20px rgba(0,240,255,0.3);"><div style="font-size:11px; color:#10b981;">✔ 图像/动图渲染完成！</div></div>`;
+                } else {
+                    vOutput.innerHTML = `<pre style="background:#000; padding:10px; border-radius:6px; color:#10b981; max-height:200px; overflow:auto;">[未找到直链, 返回报文]\n${JSON.stringify(result, null, 2)}</pre>`;
                 }
             } catch (e) { vOutput.innerHTML = `<div class="msg-error">[渲染异常] ${e.message}</div>`; }
         }
